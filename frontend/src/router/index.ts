@@ -17,14 +17,14 @@ const routes: Array<RouteRecordRaw> = [
   //   // which is lazy-loaded when the route is visited.
   //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   // },
+  // {
+  //   path: '/',
+  //   name: 'Home',
+  //   component: Home,
+  //   meta: { navHide: true },
+  // },
   {
     path: '/',
-    name: 'Home',
-    component: Home,
-    meta: { navHide: true },
-  },
-  {
-    path: '/maker',
     name: 'Maker',
     component: () => import('../views/Maker.vue'),
   },
