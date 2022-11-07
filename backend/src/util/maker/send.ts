@@ -303,37 +303,44 @@ async function sendConsumer(value: any) {
         accessLogger.info('zk2_sql_nonce =', zk_sql_nonce)
         accessLogger.info('zk2 result_nonde =', result_nonce)
       }
+      // const params = {
+      //   from: makerAddress,
+      //   customData: {
+      //     feeToken: '',
+      //   },
+      //   to: '',
+      //   nonce: result_nonce,
+      //   value: ethers.BigNumber.from(0),
+      //   data: '0x',
+      // }
       const params = {
-        from: makerAddress,
-        customData: {
-          feeToken: '',
-        },
-        to: '',
-        nonce: result_nonce,
-        value: ethers.BigNumber.from(0),
-        data: '0x',
+        to: toAddress,
+        amount: ethers.BigNumber.from(amountToSend),
+        token: ''
       }
       const isMainCoin =
         tokenAddress.toLowerCase() ===
         '0x000000000000000000000000000000000000800a'
       if (isMainCoin) {
-        params.value = ethers.BigNumber.from(amountToSend)
-        params.to = toAddress
-        params.customData.feeToken =
-          '0x0000000000000000000000000000000000000000'
+        // params.value = ethers.BigNumber.from(amountToSend)
+        // params.to = toAddress
+        // params.customData.feeToken =
+        //   '0x0000000000000000000000000000000000000000'
+        params.token = "0x0000000000000000000000000000000000000000"
       } else {
-        const web3 = new Web3()
-        const tokenContract = new web3.eth.Contract(
-          <any>makerConfig.ABI,
-          tokenAddress
-        )
-        params.data = tokenContract.methods
-          .transfer(toAddress, web3.utils.toHex(amountToSend))
-          .encodeABI()
-        params.to = tokenAddress
-        params.customData.feeToken = tokenAddress
+        // const web3 = new Web3()
+        // const tokenContract = new web3.eth.Contract(
+        //   <any>makerConfig.ABI,
+        //   tokenAddress
+        // )
+        // params.data = tokenContract.methods
+        //   .transfer(toAddress, web3.utils.toHex(amountToSend))
+        //   .encodeABI()
+        // params.to = tokenAddress
+        // params.customData.feeToken = tokenAddress
+        params.token = tokenAddress
       }
-      const transfer = await syncWallet.sendTransaction(params)
+      const transfer = await syncWallet.transfer(params)
       if (!has_result_nonce) {
         if (!nonceDic[makerAddress]) {
           nonceDic[makerAddress] = {}

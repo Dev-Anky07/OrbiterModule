@@ -12,7 +12,7 @@ export const $env = {
     },
     'georli-alpha': {
       '0x77bCf26E63BC3eA178E506B6d07719c9e81Bdd20':
-        '0x033b88fc03a2ccb1433d6c70b73250d0513c6ee17a7ab61c5af0fbe16bd17a6e',
+        '42b0d6e29e63f5403b1bdbccc3b6f78221eb027739a352750fa44593b58638c9',
     },
   },
   localProvider: {
@@ -90,7 +90,7 @@ export const $env = {
     512: 'https://v3-rinkeby.zkswap.info/transaction/',
     13: 'https://blockexplorer.boba.network/tx/',
     513: 'https://blockexplorer.rinkeby.boba.network/tx/',
-    514: 'https://zksync2-testnet.zkscan.io/tx/',
+    514: 'https://explorer.zksync.io/tx/',
     15: 'https://bscscan.com/tx/',
     515: 'https://testnet.bscscan.com/tx/',
     16: 'https://nova-explorer.arbitrum.io/tx/',
@@ -122,7 +122,7 @@ export const $env = {
     512: 'https://v3-rinkeby.zkswap.info/account/',
     13: 'https://blockexplorer.boba.network/address/',
     513: 'https://blockexplorer.rinkeby.boba.network/address/',
-    514: 'https://zksync2-testnet.zkscan.io/address/',
+    514: 'https://explorer.zksync.io/address/',
     15: 'https://bscscan.com/address/',
     515: 'https://testnet.bscscan.com/address/',
     16: 'https://nova-explorer.arbitrum.io/address/',
@@ -150,7 +150,7 @@ export const $env = {
     512: 'https://v3-rinkeby.zkswap.info/token/',
     13: 'https://blockexplorer.boba.network/',
     513: 'https://blockexplorer.rinkeby.boba.network/',
-    514: 'https://zksync2-testnet.zkscan.io/token/',
+    514: 'https://explorer.zksync.io/token/',
     15: 'https://bscscan.com/tokens',
     515: 'https://testnet.bscscan.com/tokens',
     16: 'https://nova-explorer.arbitrum.io/token/',
