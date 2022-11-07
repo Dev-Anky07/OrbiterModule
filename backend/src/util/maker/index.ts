@@ -551,6 +551,13 @@ export async function sendTransaction(
     return
   }
   const tAmount = amountToSend.tAmount
+  // valid
+  if (new BigNumber(String(tAmount)).gt(amountStr)) {
+    accessLogger.error(
+      `[${transactionID}] The actual amount sent exceeds the From amount ${tAmount}/${amountStr} `
+    )
+    return
+  }
   accessLogger.info('transactionID =', transactionID)
   accessLogger.info('amountToSend =', tAmount)
   accessLogger.info('toChain =', toChain)

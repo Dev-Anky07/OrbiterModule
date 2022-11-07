@@ -101,6 +101,7 @@ function getToAmountFromUserAmount(
   if (!toAmount_fee || isNaN(Number(toAmount_fee))) {
     return 0;
   }
+  
   if (isWei) {
     return toAmount_fee.multipliedBy(
       new BigNumber(10 ** selectMakerInfo.precision),
@@ -362,12 +363,15 @@ export function getAmountToSend(
     console.error(realAmount.error);
     return;
   }
-  
-  const rAmount = <any>realAmount.rAmount;
+  let rAmount = <any>realAmount.rAmount;
   if (nonce > 8999) {
     console.error("nonce too high, not allowed");
     return;
   }
+  if (toChainID === 3) {
+    var prefix = rAmount.substr(0,11)
+    rAmount = `${prefix}${'0'.repeat(rAmount.length - prefix.length)}`;
+  } 
   const nonceStr = pTextFormatZero(String(nonce));
   const readyAmount = getToAmountFromUserAmount(
     new BigNumber(rAmount).dividedBy(new BigNumber(10 ** pool.precision)),
