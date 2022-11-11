@@ -32,28 +32,29 @@
                         </el-form-item>
                     </template>
                 </el-table-column>
-                <el-table-column prop="gasFee" label="Withholding Fee">
-                    <template #default="{ row, $index }">
-                        <el-form-item :prop="`tableData[${$index}].gasFee`" :rules="rules.maxPrice">
-                            <div class="from_item clearfix">
-                                <el-input-number v-model="row.gasFee" :disabled="row.status != 0"></el-input-number>
-                                <!-- <el-input oninput="value = value.replace(/[^0-9.]/g,'')" class="fl" v-model="row.gasFee" placeholder="0" :readonly="row.status != 0"/> -->
-                                <span class="fl uint">ETH</span>
-                            </div>
-                        </el-form-item>
-                    </template>
-                </el-table-column>
                 <el-table-column prop="tradingFee" label="Trading Fee">
                     <template #default="{ row, $index }">
                         <el-form-item :prop="`tableData[${$index}].tradingFee`" :rules="rules.maxPrice">
                             <div class="from_item clearfix">
                                 <el-input-number v-model="row.tradingFee" :disabled="row.status != 0"></el-input-number>
                                 <!-- <el-input oninput="value = value.replace(/[^0-9.?]/g,'')" class="fl" v-model="row.tradingFee" placeholder="0" :readonly="row.status != 0"/> -->
-                                <span class="fl uint">%</span>
+                                <span class="fl uint">ETH</span>
                             </div>
                         </el-form-item>
                     </template>
                 </el-table-column>
+                <el-table-column prop="gasFee" label="Withholding Fee">
+                    <template #default="{ row, $index }">
+                        <el-form-item :prop="`tableData[${$index}].gasFee`" >
+                            <div class="from_item clearfix">
+                                <el-input-number v-model="row.gasFee" :disabled="row.status != 0"></el-input-number>
+                                <!-- <el-input oninput="value = value.replace(/[^0-9.]/g,'')" class="fl" v-model="row.gasFee" placeholder="0" :readonly="row.status != 0"/> -->
+                                <span class="fl uint">‰</span>
+                            </div>
+                        </el-form-item>
+                    </template>
+                </el-table-column>
+             
                 <el-table-column prop="status" width="100px" label="Status">
                     <template #default="{ row }">
                         <el-form-item>
