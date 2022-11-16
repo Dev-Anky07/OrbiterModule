@@ -1,3 +1,4 @@
+import { groupBy } from 'lodash';
 import BigNumber from "bignumber.js";
 import { chains } from "orbiter-chaincore";
 import { equals, isEmpty } from "orbiter-chaincore/src/utils/core";
@@ -5,6 +6,7 @@ import { makerConfig } from "../../config";
 import { IMarket } from "./new_maker";
 
 export class MakerUtil {
+    static lps: { [key: string]: Array<IMarket> } = {};
     static makerList: Array<IMarket> = [];
     static makerListHistory: Array<IMarket> = [];
     public static async refreshMakerList(): Promise<Array<IMarket> | undefined> {
@@ -14,7 +16,13 @@ export class MakerUtil {
         }
         const makerList: any = await fecthSubgraphFetchLp(process.env['SUBGRAPHS']);
         if (makerList && makerList.length > 0) {
-            MakerUtil.makerList = makerList;
+            const groupData = groupBy(makerList, 'owner');
+            for (const owner in groupData) {
+                MakerUtil.lps[owner] = groupData[owner];
+            }
+            if (makerList && makerList.length > 0) {
+                MakerUtil.makerList = makerList;
+            }
         }
         return MakerUtil.makerList;
     }
@@ -24,12 +32,12 @@ export const fecthSubgraphFetchLp = async (endpoint: string) => {
     const headers = {
         "content-type": "application/json",
     };
-    const makers = Object.keys(makerConfig.privateKeys).map(addr => addr.toLowerCase());
+    // const makers = Object.keys(makerConfig.privateKeys).map(addr => addr.toLowerCase());
     const graphqlQuery = {
         operationName: "fetchLpList",
         query: `query fetchLpList {
             lpEntities(
-                where: {maker_: {owner_in: ${JSON.stringify(makers)}}, status: 1}
+                where: {status: 1}
               ) {
           id
           createdAt
@@ -105,6 +113,7 @@ export function convertChainLPToOldLP(oldLpList: Array<any>): Array<IMarket> {
                 recipient: recipientAddress,
                 sender: senderAddress,
                 makerId: maker.id,
+                owner: maker["owner"],
                 ebcId: pair["ebcId"],
                 fromChain: {
                     id: Number(fromChainId),

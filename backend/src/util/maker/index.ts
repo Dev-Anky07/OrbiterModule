@@ -47,7 +47,7 @@ const repositoryMakerZkHash = (): Repository<MakerZkHash> => {
   return Core.db.getRepository(MakerZkHash)
 }
 
-export async function getMakerList():Promise<Array<IMarket>> {
+export async function getMakerList(makerAddr?:string):Promise<Array<IMarket>> {
   return MakerUtil.makerList;
 }
 

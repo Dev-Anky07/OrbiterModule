@@ -7,6 +7,10 @@ import axios from 'axios'
 import { makerListHistory, makerList } from '../configs'
 import { utils } from 'ethers'
 import * as Keyv from 'keyv';
+import { chains } from 'orbiter-chaincore/src/utils';
+const mainnetChains = require('../../../../backend/src/config/chains.json');
+const testnetChains = require('../../../../backend/src/config/testnet.json');
+chains.fill(<any>[...mainnetChains, ...testnetChains])
 const keyv = new Keyv();
 async function getAllMakerList() {
   return makerList.concat(makerListHistory)
@@ -227,21 +231,8 @@ export async function transforeUnmatchedTradding(list = []) {
  */
 async function getChainName(chainId: string) {
   // Temporarily, the public chain name can be obtained from chaincore
-  switch (String(chainId)) {
-    case "16":
-      return 'Nova';
-    // oether
-  }
-  const makerList = await getAllMakerList();
-  const row1 = makerList.find(row => String(row.c1ID) == String(chainId));
-  if (row1) {
-    return row1.c1Name;
-  }
-  const row2 = makerList.find(row => String(row.c2ID) == String(chainId));
-  if (row2) {
-    return row2.c2Name;
-  }
-  return '';
+  const chain = await chains.getChainByInternalId(chainId);
+  return chain && chain.name;
 }
 export async function transforeData(list = []) {
   // fill data
