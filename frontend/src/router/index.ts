@@ -25,6 +25,13 @@ const routes: Array<RouteRecordRaw> = [
   // },
   {
     path: '/',
+    name: 'Home',
+    component: Home,
+    redirect: "/maker",
+    meta: { navHide: true },
+  },
+  {
+    path: '/maker',
     name: 'Maker',
     component: () => import('../views/Maker.vue'),
   },
