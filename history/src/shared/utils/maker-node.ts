@@ -8,8 +8,8 @@ import { makerListHistory, makerList } from '../configs'
 import { utils } from 'ethers'
 import * as Keyv from 'keyv';
 import { chains } from 'orbiter-chaincore/src/utils';
-const mainnetChains = require('../../../../backend/src/config/chains.json');
-const testnetChains = require('../../../../backend/src/config/testnet.json');
+const mainnetChains = require('../configs/chains.json');
+const testnetChains = require('../configs/testnet.json');
 chains.fill(<any>[...mainnetChains, ...testnetChains])
 const keyv = new Keyv();
 async function getAllMakerList() {

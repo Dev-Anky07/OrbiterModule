@@ -22,7 +22,6 @@ const DBConfig:any = {
   ],
   // synchronize: isLocal()
 }
-console.log('dbConfig ----', DBConfig);
 @Module({
   imports: [
     TypeOrmModule.forRoot(DBConfig),
