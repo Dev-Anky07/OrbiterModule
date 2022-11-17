@@ -7,10 +7,11 @@ import axios from 'axios'
 import { makerListHistory, makerList } from '../configs'
 import { utils } from 'ethers'
 import * as Keyv from 'keyv';
-import { chains } from 'orbiter-chaincore/src/utils';
+import * as chainCore from 'orbiter-chaincore';
+console.log(chainCore, '==chainCore')
 const mainnetChains = require('../configs/chains.json');
 const testnetChains = require('../configs/testnet.json');
-chains.fill(<any>[...mainnetChains, ...testnetChains])
+// chains.fill(<any>[...mainnetChains, ...testnetChains])
 const keyv = new Keyv();
 async function getAllMakerList() {
   return makerList.concat(makerListHistory)
@@ -231,8 +232,8 @@ export async function transforeUnmatchedTradding(list = []) {
  */
 async function getChainName(chainId: string) {
   // Temporarily, the public chain name can be obtained from chaincore
-  const chain = await chains.getChainByInternalId(chainId);
-  return chain && chain.name;
+  // const chain = await chains.getChainByInternalId(chainId);
+  // return chain && chain.name;
 }
 export async function transforeData(list = []) {
   // fill data

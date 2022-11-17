@@ -829,6 +829,9 @@ watch(() => makerAddressSelected?.value, init)
   .el-card__header {
     font-size: 18px;
     font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: #555555;
   }
 
