@@ -1,55 +1,23 @@
 export const $env = {
   baseUrl: '',
   apiBaseUrl: '//maker_dashboard_test.orbiter.finance/api/dashboard/',
-  // apiBaseUrl: '',
   historyApiUrl: `//maker_dashboard_test.orbiter.finance/api/history/`,
   credential: false,
   starknetL1MapL2: {
     'mainnet-alpha': {
-      '': '',
+      '0x80c67432656d59144ceff962e8faf8926599bcf8': '0x07c57808b9cea7130c44aab2f8ca6147b04408943b48c6d8c3c83eb8cfdd8c0b',
+      '0x095d2918b03b2e86d68551dcf11302121fb626c9': '0x01998b5f1512f76cfe238c125df6541253c8f07f9d2eb2d50f5222f059165685',
     },
     'georli-alpha': {
       '0x0043d60e87c5dd08c86c3123340705a1556c4719':
         '0x033b88fc03a2ccb1433d6c70b73250d0513c6ee17a7ab61c5af0fbe16bd17a6e',
     },
   },
-  defaultMinPrice: {
-    1: {
-      1: '5000000000000000',
-      2: '5000000000000000',
-      3: '5000000000000000',
-      4: '5000000000000000', // starknet
-      5: '5000000000000000', // rinkeby
-      6: '5000000000000000', // polygon
-      7: '5000000000000000', // optimism
-      8: '5000000000000000', // mainnet
-      9: '5000000000000000', // loopring
-      10: '5000000000000000',
-      11: '5000000000000000', // loopring
-      22: '5000000000000000', // arbitrum test
-      33: '5000000000000000', // zktest
-      44: '5000000000000000', // starknet(R)
-      66: '5000000000000000', // polygon(R)
-      77: '5000000000000000', // optimism(K)
-      88: '5000000000000000', // ropsten
-      99: '5000000000000000', // loopring(G)
-      510: '5000000000000000', // metis(G)
-      511: '5000000000000000', // dydx(R)
-      13: '5000000000000000', // boba
-      513: '5000000000000000', // boba(R)
-      514: '5000000000000000', // zk2
-      15: '5000000000000000', // bsc
-      515: '5000000000000000', // bsc(R)
-      16: '5000000000000000',
-      516: '5000000000000000',
-      599: '5000000000000000'
-    }
-  },
   localProvider: {
     1: 'https://mainnet.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad',
     2: 'https://arb-mainnet.g.alchemy.com/v2/ILj6pmkFfRO3KflhcnPxVFtuqZvwgkgr',
     5: 'https://goerli.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad', // goerli
-    22: 'https://arb-rinkeby.g.alchemy.com/v2/ILj6pmkFfRO3KflhcnPxVFtuqZvwgkgr',
+    22: 'https://goerli-rollup.arbitrum.io/rpc/',
     15: 'https://bsc-dataseed1.binance.org',
     517: 'https://public.zkevm-test.net:2083',
     518: 'https://prealpha.scroll.io/l1',
@@ -59,7 +27,7 @@ export const $env = {
     1: 'wss://mainnet.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad',
     2: 'wss://arb-mainnet.g.alchemy.com/v2/ILj6pmkFfRO3KflhcnPxVFtuqZvwgkgr',
     5: 'wss://goerli.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad', // rinkeby
-    22: 'wss://arb-rinkeby.g.alchemy.com/v2/ILj6pmkFfRO3KflhcnPxVFtuqZvwgkgr',
+    22: 'https://goerli-rollup.arbitrum.io/rpc/',
     6: 'https://polygon-mumbai.g.alchemy.com/v2/akjFuzojFyDyF67GAMXV1HGqlK6SPEGp',
     66: 'https://polygon-mumbai.g.alchemy.com/v2/akjFuzojFyDyF67GAMXV1HGqlK6SPEGp',
   },
@@ -103,7 +71,7 @@ export const $env = {
     1: 'https://etherscan.io/tx/', // /tx/  /address/
     5: 'https://goerli.etherscan.io/tx/', // /tx/  /address/
     2: 'https://arbiscan.io/tx/', // /tx/  /address/
-    22: 'https://testnet.arbiscan.io/tx/',
+    22: 'https://goerli.arbiscan.io/tx/',
     3: 'https://zkscan.io/explorer/transactions/',
     33: 'https://goerli.zkscan.io/explorer/transactions/', // /explorer/transactions/   /explorer/accounts/
     4: 'https://beta.voyager.online/tx/',
@@ -137,7 +105,7 @@ export const $env = {
     1: 'https://etherscan.io/address/', // /tx/  /address/
     5: 'https://goerli.etherscan.io/address/', // /tx/  /address/
     2: 'https://arbiscan.io/address/', // /tx/  /address/
-    22: 'https://testnet.arbiscan.io/address/',
+    22: 'https://goerli.arbiscan.io/address/',
     3: 'https://zkscan.io/explorer/accounts/',
     33: 'https://goerli.zkscan.io/explorer/accounts/', // /explorer/transactions/   /explorer/accounts/
     4: 'https://beta.voyager.online/contract/',
@@ -171,7 +139,7 @@ export const $env = {
     1: 'https://etherscan.io/token/', // /token/
     5: 'https://goerli.etherscan.io/token/', // /token/
     2: 'https://arbiscan.io/address/', // /address/
-    22: 'https://testnet.arbitrum.io/address/',
+    22: 'https://goerli.arbiscan.io/token/',
     3: 'https://etherscan.io/token/', // same as etherscan
     33: 'https://goerli.etherscan.io/token/',
     4: 'https://beta.voyager.online/token/',
