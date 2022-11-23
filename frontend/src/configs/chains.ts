@@ -345,6 +345,30 @@ const metamaskChains = {
       ],
       "infoURL": "https://arbitrum.io",
       "parent": {}
+    },
+    {
+      "name": "Orbiter Testnet",
+      "chainId": 599,
+      "shortName": "Orbiter Testnet",
+      "chain": "ETH",
+      "networkId": 599,
+      "nativeCurrency": {
+        "name": "Ether",
+        "symbol": "ETH",
+        "decimals": 18
+      },
+      "rpc": [],
+      "faucets": [],
+      "explorers": [
+        {
+          "name": "Orbiter Chain Explorer",
+          "url": "https://",
+          "icon": "blockscout",
+          "standard": "EIP3091"
+        }
+      ],
+      "infoURL": "",
+      "parent": {}
     }
   ]
 }

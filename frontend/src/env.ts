@@ -53,7 +53,8 @@ export const $env = {
     15: 'https://bsc-dataseed1.binance.org',
     517: 'https://public.zkevm-test.net:2083',
     518: 'https://prealpha.scroll.io/l1',
-    519: 'https://prealpha.scroll.io/l2'
+    519: 'https://prealpha.scroll.io/l2',
+    599: 'http://ec2-54-178-23-104.ap-northeast-1.compute.amazonaws.com:8545'
   },
   localWSProvider: {
     1: 'wss://mainnet.infura.io/v3/460f40a260564ac4a4f4b3fffb032dad',
@@ -62,10 +63,11 @@ export const $env = {
     22: 'https://goerli-rollup.arbitrum.io/rpc/',
     6: 'https://polygon-mumbai.g.alchemy.com/v2/akjFuzojFyDyF67GAMXV1HGqlK6SPEGp',
     66: 'https://polygon-mumbai.g.alchemy.com/v2/akjFuzojFyDyF67GAMXV1HGqlK6SPEGp',
+    599: 'http://ec2-54-178-23-104.ap-northeast-1.compute.amazonaws.com:8545'
   },
   supportLocalNetWorksIDs: [
     1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22, 33, 44, 66, 77, 88, 99, 511, 514, 15, 515, 15,
-    515, 16, 516, 517, 518, 519
+    515, 16, 516, 517, 518, 519,599
   ],
   localChainID_netChainID: {
     1: '1', // mainnet
@@ -97,7 +99,8 @@ export const $env = {
     516: '421613',
     517: '1402',
     518: '534351',
-    519: '534354'
+    519: '534354',
+    599: '599'
   },
   txExploreUrl: {
     1: 'https://etherscan.io/tx/', // /tx/  /address/
