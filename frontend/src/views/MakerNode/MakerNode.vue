@@ -95,7 +95,7 @@
 
 
 <script lang="ts">
-import { ref, reactive, nextTick } from 'vue'
+import { ref, reactive, nextTick, onUnmounted } from 'vue';
 import TokenSelect from './TokenSelect.vue'
 import SetTable from './SetTable.vue'
 import { chain2icon, makerToken, chainName } from '../../utils/chain2id'
@@ -132,6 +132,12 @@ export default {
         const result = reactive({})
         const makerAddr = ref("")
         const multipleSelection = reactive([])
+        let timer: any = ref();
+        onUnmounted(async () => {
+            console.log('Clear interval');
+            clearInterval(timer);
+            timer = null;
+        });
         return {
             result,
             isCreate: true,
@@ -154,7 +160,8 @@ export default {
             loading,
             contract_ORMakerDeposit,
             contract_ORProtocalV1,
-            multipleSelection
+            multipleSelection,
+            timer
         }
     },
     async mounted() {
@@ -165,7 +172,8 @@ export default {
         this.tokenType = makerToken.find(item => item.chainid == this.tokenItem)
 
         const self = this;
-        setInterval(() => {
+        this.timer = setInterval(() => {
+            console.log('Execute timer');
             self.updateStatus();
         }, 30000);
     },
