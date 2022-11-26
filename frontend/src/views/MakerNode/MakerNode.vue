@@ -89,10 +89,6 @@
                     <span>Confirm and Reduce {{payEth}} ETH Margin</span>
                 </div>
             </div>
-
-            <div style="position: fixed;bottom:40px;right:40px">
-                <svg-icon @click="reloadPage" :iconName="'refresh'" style="width: 40px; height: 40px;"></svg-icon>
-            </div>
         </div>
     </div>
 </template>
@@ -167,6 +163,11 @@ export default {
         this.getIdleAmount()
         this.loading = false
         this.tokenType = makerToken.find(item => item.chainid == this.tokenItem)
+
+        const self = this;
+        setInterval(() => {
+            self.updateStatus();
+        }, 30000);
     },
     computed: {
         ...mapState(['account', 'isMaker', 'maker']),
@@ -181,8 +182,27 @@ export default {
         },
     },
     methods: {
-        reloadPage() {
-            location.reload();
+        async updateStatus(){
+            if (!this.result || this.result.makerEntities.length == 0) return
+            let data = this.result.makerEntities[0]
+            let actions = data.effectLpIds
+            if(!actions)return
+            let lpList = actions.map(v => data.lps.filter(item => item.id === v));
+            let timer = new Date().getTime() / 1000
+            let contract_manager = await contract_obj('ORManager');
+            lpList.map(async v => {
+                let ebcAddr = await contract_manager.methods.getEBC(v[0].pair.ebcId).call();
+                this.contract_ORProtocalV1 = await contract_obj('ORProtocalV1', ebcAddr);
+                const stopDealyTime = await this.contract_ORProtocalV1.methods.getStopDealyTime(v[0].pair.sourceChain).call();
+                const isStop = timer >= (Number(stopDealyTime) + Number(v[0].stopTime)) ? true : false;
+                const isPause = v[0].status == 1 ? true : false;
+                // console.log('xxxxx ==>', stopDealyTime, isStop, (Number(stopDealyTime) + Number(v[0].stopTime)))
+                v[0].pair.sourceChain;
+                const tableData = this.tableList.find(item => item.sourceChain == v[0].pair.sourceChain && item.destChain == v[0].pair.destChain &&
+                    item.sourceTAddress == v[0].pair.sourceToken && item.destTAddress == v[0].pair.destToken);
+                tableData.isStop = isStop;
+                tableData.isPause = isPause;
+            });
         },
         showChainIcon(localChainID) {
             return chain2icon(Number(localChainID))
