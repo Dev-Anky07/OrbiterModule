@@ -196,8 +196,6 @@ export default {
                 const stopDealyTime = await this.contract_ORProtocalV1.methods.getStopDealyTime(v[0].pair.sourceChain).call();
                 const isStop = timer >= (Number(stopDealyTime) + Number(v[0].stopTime)) ? true : false;
                 const isPause = v[0].status == 1 ? true : false;
-                // console.log('xxxxx ==>', stopDealyTime, isStop, (Number(stopDealyTime) + Number(v[0].stopTime)))
-                v[0].pair.sourceChain;
                 const tableData = this.tableList.find(item => item.sourceChain == v[0].pair.sourceChain && item.destChain == v[0].pair.destChain &&
                     item.sourceTAddress == v[0].pair.sourceToken && item.destTAddress == v[0].pair.destToken);
                 tableData.isStop = isStop;
