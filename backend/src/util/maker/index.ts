@@ -361,6 +361,7 @@ export async function confirmToSNTransaction(
       ) {
         return true
       }
+      return false;
       // return rollback(transaction['transaction_failure_reason'] && transaction['transaction_failure_reason']['error_message'], nonce);
     } else if (
       ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'].includes(txStatus)
