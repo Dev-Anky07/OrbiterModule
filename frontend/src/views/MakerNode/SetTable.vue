@@ -188,18 +188,18 @@ const inputChange = (row, prop) => {
         };
         return;
     }
-    if (prop == 'tradingFee' || prop == 'maxPrice') {
-        if (row.maxPrice <= row.tradingFee) {
-            row[prop + 'Error'] = {
-                msg: 'Limit less than trading fee',
-                color: '#e4ad5a'
-            };
-            return;
-        } else {
-            row['maxPriceError'] = '';
-            row['tradingFeeError'] = '';
-        }
-    }
+    // if (prop == 'tradingFee' || prop == 'maxPrice') {
+    //     if (row.maxPrice <= row.tradingFee) {
+    //         row[prop + 'Error'] = {
+    //             msg: 'Limit less than trading fee',
+    //             color: '#e4ad5a'
+    //         };
+    //         return;
+    //     } else {
+    //         row['maxPriceError'] = '';
+    //         row['tradingFeeError'] = '';
+    //     }
+    // }
     if (prop == 'gasFee') {
         if (row.gasFee >= 10) {
             row[prop + 'Error'] = {
