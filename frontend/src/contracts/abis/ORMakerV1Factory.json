@@ -127,6 +127,11 @@
         "internalType": "address",
         "name": "_manager",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_makerMaxLimit",
+        "type": "uint256"
       }
     ],
     "name": "initialize",

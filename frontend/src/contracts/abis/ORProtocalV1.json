@@ -33,33 +33,7 @@
   },
   {
     "inputs": [],
-    "name": "ChangeLpEffectInterval",
-    "outputs": [
-      {
-        "internalType": "uint32",
-        "name": "",
-        "type": "uint32"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "ChanllengePledgeAmountCoefficient",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "DepositAmountCoefficient",
     "outputs": [
       {
         "internalType": "uint256",
@@ -75,9 +49,9 @@
     "name": "EthPunishCoefficient",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint16",
         "name": "",
-        "type": "uint256"
+        "type": "uint16"
       }
     ],
     "stateMutability": "view",
@@ -101,8 +75,37 @@
     "name": "TokenPunishCoefficient",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint16",
         "name": "",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "calculateCompensation",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "baseValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "additiveValue",
         "type": "uint256"
       }
     ],
@@ -350,7 +353,7 @@
   },
   {
     "inputs": [],
-    "name": "getChangeLpAfterEffectInterval",
+    "name": "getChanllengePledgeAmountCoefficient",
     "outputs": [
       {
         "internalType": "uint256",
@@ -363,7 +366,20 @@
   },
   {
     "inputs": [],
-    "name": "getChanllengePledgeAmountCoefficient",
+    "name": "getETHPunishCoefficient",
+    "outputs": [
+      {
+        "internalType": "uint16",
+        "name": "",
+        "type": "uint16"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getPauseAfterStopInterval",
     "outputs": [
       {
         "internalType": "uint256",
@@ -387,11 +403,16 @@
         "type": "uint256"
       }
     ],
-    "name": "getDepositAmount",
+    "name": "getPledgeAmount",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "baseValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "additiveValue",
         "type": "uint256"
       }
     ],
@@ -400,57 +421,12 @@
   },
   {
     "inputs": [],
-    "name": "getDepositAmountCoefficient",
+    "name": "getPledgeAmountSafeRate",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint32",
         "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "getETHPunish",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getETHPunishCoefficient",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getPauseAfterStopInterval",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -605,32 +581,13 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "getTokenPunish",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "getTokenPunishCoefficient",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint16",
         "name": "",
-        "type": "uint256"
+        "type": "uint16"
       }
     ],
     "stateMutability": "view",
@@ -640,7 +597,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "managerAddress",
+        "name": "_controlContract",
         "type": "address"
       },
       {
@@ -649,19 +606,19 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "_depositAmountCoefficient",
-        "type": "uint256"
+        "internalType": "uint32",
+        "name": "_pledgeAmountSafeRate",
+        "type": "uint32"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint16",
         "name": "_ethPunishCoefficient",
-        "type": "uint256"
+        "type": "uint16"
       },
       {
-        "internalType": "uint256",
+        "internalType": "uint16",
         "name": "_tokenPunishCoefficie",
-        "type": "uint256"
+        "type": "uint16"
       },
       {
         "internalType": "uint32",
@@ -702,20 +659,20 @@
   },
   {
     "inputs": [],
-    "name": "renounceOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+    "name": "pledgeAmountSafeRate",
+    "outputs": [
       {
         "internalType": "uint32",
-        "name": "value",
+        "name": "",
         "type": "uint32"
       }
     ],
-    "name": "setChangeLpAfterEffectInterval",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -736,22 +693,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint16",
         "name": "hundredDigits",
-        "type": "uint256"
-      }
-    ],
-    "name": "setDepositAmountCoefficient",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "hundredDigits",
-        "type": "uint256"
+        "type": "uint16"
       }
     ],
     "name": "setETHPunishCoefficient",
@@ -775,9 +719,22 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint32",
+        "name": "value",
+        "type": "uint32"
+      }
+    ],
+    "name": "setPledgeAmountSafeRate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint16",
         "name": "hundredDigits",
-        "type": "uint256"
+        "type": "uint16"
       }
     ],
     "name": "setTokenPunishCoefficient",
