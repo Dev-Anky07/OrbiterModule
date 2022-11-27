@@ -736,6 +736,12 @@ export default {
           message: `Please select network`,
           type: 'error',
         })
+        if (!this.multipleSelection.length)
+            return ElNotification({
+                title: 'Error',
+                message: `Please select transaction`,
+                type: 'error',
+         })
       this.setTable.handleSubmit()
       if (this.isValidate) {
         console.log('ismaker ==>', this.isMaker)
@@ -824,7 +830,12 @@ export default {
           message: `No idle funds`,
           type: 'error',
         })
-
+        if (!this.multipleSelection.length)
+            return ElNotification({
+                title: 'Error',
+                message: `Please select transaction`,
+                type: 'error',
+            })
       const loading = ElLoading.service({
         lock: true,
         text: 'Loading',
@@ -1076,12 +1087,14 @@ export default {
             message: type == 1 ? `Pause successfully` : `Stop successfully`,
             type: 'success',
           })
+            const self = this;
           setTimeout(() => {
             // loading.close()
+            // location.reload()
               for(const dt of row){
                   dt.loading = false
               }
-            location.reload()
+              self.updateStatus();
           }, 10000)
         }
       } else {
