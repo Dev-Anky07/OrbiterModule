@@ -55,13 +55,15 @@
         <div class="margin_test">
           <div>
             <span style="font-weight: bold; font-size: 16px"
-              >Idle Funds: <span style="color:red">{{ makerContractFreeBalance }}</span> ETH</span
+              >Idle Funds:
+              <span style="color: red">{{ makerContractFreeBalance }}</span>
+              ETH</span
             >
             <br />
             <span style="font-weight: bold; font-size: 16px"
-              >Pledged Amount: <span style="color:red">{{ pledgedAmount }}</span> ETH</span
+              >Pledged Amount:
+              <span style="color: red">{{ pledgedAmount }}</span> ETH</span
             >
-            
           </div>
 
           <span
@@ -69,6 +71,7 @@
             v-if="pageStatus === 1"
             >The Margin amount you need to deposit in Orbiter Contract:</span
           >
+
           <span
             style="font-weight: bold; font-size: 16px"
             v-if="pageStatus === 2"
@@ -207,8 +210,9 @@ export default {
     const pageStatus = ref(1)
     const payEth = ref(0)
     const makerContractFreeBalance = ref(0)
+    const actionLpPayAmount = ref(0)
     const pledgedAmount = ref(0)
-    
+
     const ethAmount = ref(0)
     const stakeAmount = ref(0)
     const tokenItem = ref(1)
@@ -238,6 +242,7 @@ export default {
       pageStatus,
       ethTotal,
       payEth,
+      actionLpPayAmount,
       pledgedAmount,
       makerContractFreeBalance,
       ethAmount,
@@ -337,20 +342,20 @@ export default {
         await this.contract_ORMakerDeposit.methods
           .idleAmount(tokenType[0].address)
           .call()
-        console.log(makerContractFreeBalance, '==makerContractFreeBalance', tokenType[0].address)
+      console.log(
+        makerContractFreeBalance,
+        '==makerContractFreeBalance',
+        tokenType[0].address
+      )
       this.makerContractFreeBalance = this.$web3.utils.fromWei(
         makerContractFreeBalance,
         'ether'
       )
 
-      const pledgedAmount =
-        await this.contract_ORMakerDeposit.methods
-          .getPledgeBalance(tokenType[0].address)
-          .call()
-    this.pledgedAmount = this.$web3.utils.fromWei(
-        pledgedAmount,
-        'ether'
-      );
+      const pledgedAmount = await this.contract_ORMakerDeposit.methods
+        .getPledgeBalance(tokenType[0].address)
+        .call()
+      this.pledgedAmount = this.$web3.utils.fromWei(pledgedAmount, 'ether')
       // let banl = await this.$web3.eth.getBalance(this.makerAddr)
       // console.log("getBalance ==>", this.$web3.utils.fromWei(banl, 'ether'))
       //   const stakeAmount = await this.contract_ORMakerDeposit.methods
@@ -381,29 +386,41 @@ export default {
           )
         })
       )
-      const makerDeposit = await contract_obj('ORMakerDeposit', this.makerAddr)
-      const lplist = this.multipleSelection
-        .map((row) => {
-          if (row.maxPrice !== '' && row.status == 0) {
-            const maxPrice = this.$web3.utils.toWei(row.maxPrice + '', 'ether')
-            return {
-              pairId: `0x${this.getPairID(row)}`,
-              fromChain: row.sourceChain,
-              fromToken: row.sourceTAddress,
-              maxPrice: maxPrice,
-              ebcId: row.ebcid,
-            }
-          }
-        })
-        .filter((row) => row)
-      if (lplist.length > 0) {
-        const result = await makerDeposit.methods
-          .calcLpPledgeAmount(lplist)
-          .call()
-        needStake = this.$web3.utils.fromWei(
-          result.totalPledgeValue + '',
-          'ether'
+      console.log(this.makerAddr, '==this.makerAddr')
+      if (this.makerAddr !== '0x0000000000000000000000000000000000000000') {
+        const makerDeposit = await contract_obj(
+          'ORMakerDeposit',
+          this.makerAddr
         )
+        const lplist = this.multipleSelection
+          .map((row) => {
+            if (row.maxPrice !== '' && row.status == 0) {
+              const maxPrice = this.$web3.utils.toWei(
+                row.maxPrice + '',
+                'ether'
+              )
+              return {
+                pairId: `0x${this.getPairID(row)}`,
+                fromChain: row.sourceChain,
+                fromToken: row.sourceTAddress,
+                maxPrice: maxPrice,
+                ebcId: row.ebcid,
+              }
+            }
+          })
+          .filter((row) => row)
+        if (lplist.length > 0) {
+          console.log(JSON.stringify(lplist), '==lplist calc')
+          const result = await makerDeposit.methods
+            .calcLpPledgeAmount(lplist)
+            .call()
+          needStake = this.$web3.utils.fromWei(
+            result.totalPledgeValue + '',
+            'ether'
+          )
+          needStake += (needStake * 10) / 100
+          this.actionLpPayAmount = needStake
+        }
       }
 
       // await Promise.all(this.multipleSelection.map(async (v) => {
@@ -425,6 +442,7 @@ export default {
       //     }
       // }))
       // this.ethTotal = needStake
+      console.log(this.isMaker, '=this.isMaker')
       console.log('needStake ==>', needStake, this.makerContractFreeBalance)
       if (this.isMaker) {
         if (Number(needStake) >= Number(this.makerContractFreeBalance)) {
@@ -1014,6 +1032,7 @@ export default {
             lpDtList.push({ pid, lpid: lpdt.id })
           }
         }
+        console.log(lpDtList, '==lpDtList')
         lpInfos = lpDtList
       }
 
