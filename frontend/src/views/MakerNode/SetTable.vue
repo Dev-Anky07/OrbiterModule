@@ -49,9 +49,9 @@
                 <el-table-column prop="tradingFee" width="150">
                     <template #header>
                         <div style="text-align: center">
-                            Trading Fee
+                             Withholding Fee
                             <el-tooltip class="item" effect="light"
-                                        content="After the transfer is completed, you can get a certain reward according to the percentage of the transfer amount."
+                                        content="An upfront fee to cover the gas fee for transfers to the destination network(Depending on the destination network). "
                                         placement="top">
                                 <svg-icon :iconName="'sigh-a'"
                                           style="width: 16px; height: 16px;vertical-align: -0.2rem"></svg-icon>
@@ -74,9 +74,9 @@
                 <el-table-column prop="gasFee" width="150">
                     <template #header>
                         <div style="text-align: center">
-                            Withholding Fee
+                            Trading Fee
                             <el-tooltip class="item" effect="light"
-                                        content="An upfront fee to cover the gas fee for transfers to the destination network (Depending on the destination network)."
+                                        content="After the transfer is completed, you can get a certain reward according to the percentage of the transfer amount."
                                         placement="top">
                                 <svg-icon :iconName="'sigh-a'"
                                           style="width: 16px; height: 16px;vertical-align: -0.2rem"></svg-icon>

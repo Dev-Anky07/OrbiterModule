@@ -90,13 +90,13 @@
         <div class="margin_input clearfix">
           <div class="margin_input_box">
             <div class="price" v-if="pageStatus == 1">
-              <span>{{ payEth }}</span>
+              <span>{{ actionLpPayAmount }}</span>
             </div>
             <div class="price" v-if="pageStatus == 2">
-              <span>+</span><span>{{ payEth }}</span>
+              <span></span><span>{{ actionLpPayAmount }}</span>
             </div>
             <div class="price" v-if="pageStatus == 3">
-              <span>-</span><span>{{ payEth }}</span>
+              <span></span><span>{{ actionLpPayAmount }}</span>
             </div>
             <!-- <el-input v-if="pageStatus == 1" class="fl" v-model="payEth" placeholder="" readonly /> -->
             <span class="fl uint">ETH</span>
@@ -168,14 +168,15 @@
         <span>I have read the document and already know the risk.</span>
       </div>
       <div class="margin_btnbox">
-        <div class="margin_btn" @click="createMaker" v-if="pageStatus === 1">
+        <div class="margin_btn" @click="createMaker" v-if="!isMaker">
           <span>Deposit {{ payEth }} ETH Margin and Go to Next Step</span>
         </div>
-        <div class="margin_btn" @click="createMaker" v-if="pageStatus === 2">
-          <span>Confirm and Add {{ payEth }} ETH Margin</span>
+        <div class="margin_btn" @click="createMaker" v-if="isMaker">
+          <span>Confirm and Add {{ actionLpPayAmount }} ETH Margin</span>
         </div>
-        <div class="margin_btn" @click="reduceStake" v-if="pageStatus === 3">
-          <span>Confirm and Reduce {{ payEth }} ETH Margin</span>
+        <br>
+        <div class="margin_btn" @click="reduceStake" v-if="makerContractFreeBalance > 0">
+          <span>Confirm and Reduce {{ makerContractFreeBalance }} ETH Margin</span>
         </div>
       </div>
     </div>
@@ -332,6 +333,7 @@ export default {
       this.tokenType = makerToken.find((item) => item.chainid == val)
     },
     setMultipleSelection(val) {
+    console.log(val, '===setMultipleSelection')
       this.multipleSelection = val
       this.setTabList(this.tableList)
     },
@@ -394,6 +396,7 @@ export default {
         )
         const lplist = this.multipleSelection
           .map((row) => {
+            console.log(row, '===row')
             if (row.maxPrice !== '' && row.status == 0) {
               const maxPrice = this.$web3.utils.toWei(
                 row.maxPrice + '',
@@ -410,18 +413,19 @@ export default {
           })
           .filter((row) => row)
         if (lplist.length > 0) {
-          console.log(JSON.stringify(lplist), '==lplist calc')
           const result = await makerDeposit.methods
             .calcLpPledgeAmount(lplist)
             .call()
-          needStake = this.$web3.utils.fromWei(
-            result.totalPledgeValue + '',
-            'ether'
+          needStake = Number(
+            this.$web3.utils.fromWei(result.totalPledgeValue + '', 'ether')
           )
-          needStake += (needStake * 10) / 100
-          this.actionLpPayAmount = needStake
+          console.log(result, '=ok=result')
+          if (needStake > 0) {
+            needStake = needStake + (needStake * 10) / 100
+          }
         }
       }
+      this.actionLpPayAmount = needStake
 
       // await Promise.all(this.multipleSelection.map(async (v) => {
       //     if (v.maxPrice !== '' && v.status == 0) {
@@ -448,13 +452,13 @@ export default {
         if (Number(needStake) >= Number(this.makerContractFreeBalance)) {
           nextTick(() => {
             this.pageStatus = 2
-            this.payEth = needStake - this.makerContractFreeBalance
+            this.payEth = needStake
             this.ethTotal = this.payEth
           })
         } else {
           nextTick(() => {
             this.pageStatus = 3
-            this.payEth = this.makerContractFreeBalance - needStake
+            this.payEth = needStake
           })
         }
       } else {
