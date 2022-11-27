@@ -23,7 +23,7 @@
           </el-menu-item>
         </el-menu>
         <div class="link_wallet">
-          <el-button v-if="!isLink" size="small" round @click="getLinksStatus">Connct a Wallet</el-button>
+          <el-button v-if="!isLink" size="small" round @click="getLinksStatus">Connect a Wallet</el-button>
           <span v-else>{{walletAccount}}</span>
         </div>
         <div class="header-maker" v-if="makerAddressSelected">

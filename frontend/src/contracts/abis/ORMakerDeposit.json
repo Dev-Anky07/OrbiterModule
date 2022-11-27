@@ -194,31 +194,6 @@
         "internalType": "bytes32",
         "name": "lpId",
         "type": "bytes32"
-      }
-    ],
-    "name": "LogLPStop",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "pairId",
-        "type": "bytes32"
-      },
-      {
-        "indexed": false,
-        "internalType": "bytes32",
-        "name": "lpId",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "enum IORMakerDeposit.lpState",
-        "name": "state",
-        "type": "uint8"
       },
       {
         "components": [
@@ -289,7 +264,219 @@
         "type": "tuple"
       }
     ],
-    "name": "LogLpInfo",
+    "name": "LogLPPause",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "pairId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "lpId",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "sourceChain",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "destChain",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "sourceTAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "destTAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sourcePresion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "destPresion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ebcid",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "gasFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tradingFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct OperationsLib.lpInfo",
+        "name": "lpinfo",
+        "type": "tuple"
+      }
+    ],
+    "name": "LogLPStop",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "pairId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "lpId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "LogLPUserStop",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "pairId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "lpId",
+        "type": "bytes32"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "sourceChain",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "destChain",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "sourceTAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "destTAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "sourcePresion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "destPresion",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ebcid",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "gasFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tradingFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startTime",
+            "type": "uint256"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct OperationsLib.lpInfo",
+        "name": "lpinfo",
+        "type": "tuple"
+      }
+    ],
+    "name": "LogLpAction",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "pairId",
+        "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "lpId",
+        "type": "bytes32"
+      }
+    ],
+    "name": "LogLpRestart",
     "type": "event"
   },
   {
@@ -310,12 +497,6 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "startTime",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
         "name": "gasFee",
         "type": "uint256"
       },
@@ -326,7 +507,7 @@
         "type": "uint256"
       }
     ],
-    "name": "MakerChangeLP",
+    "name": "LogLpUpdate",
     "type": "event"
   },
   {
@@ -508,6 +689,31 @@
       {
         "components": [
           {
+            "internalType": "bytes32",
+            "name": "pid",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "lpid",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct OperationsLib.lpRestart[]",
+        "name": "_lps",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "LPRestart",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
             "internalType": "uint256",
             "name": "sourceChain",
             "type": "uint256"
@@ -584,12 +790,12 @@
         "components": [
           {
             "internalType": "bytes32",
-            "name": "pairId",
+            "name": "pid",
             "type": "bytes32"
           },
           {
             "internalType": "bytes32",
-            "name": "lpId",
+            "name": "lpid",
             "type": "bytes32"
           },
           {
@@ -603,7 +809,7 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct OperationsLib.changeLP[]",
+        "internalType": "struct OperationsLib.lpChange[]",
         "name": "_lpinfos",
         "type": "tuple[]"
       }

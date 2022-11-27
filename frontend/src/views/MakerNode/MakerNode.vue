@@ -28,7 +28,10 @@
                 <span>Set Withholding Fee, Trading Fee and Trasaction Limit for each transaction pair.</span>
             </div>
             <div class="form_box">
-                <SetTable ref="setTable" :tableList="tableList" @setMultipleSelection="setMultipleSelection" @setTabList="setTabList" @setIsValidate="setIsValidate" @stopLp="stopLp" @pauseLp="pauseLp"></SetTable>
+                <SetTable ref="setTable" :tableList="tableList" @setMultipleSelection="setMultipleSelection"
+                          @setTabList="setTabList" @setIsValidate="setIsValidate"
+                          @stopLp="stopLp" @pauseLp="pauseLp" @restartLp="restartLp"
+                          @selectStopLp="selectStopLp" @selectRestartLp="selectRestartLp"></SetTable>
             </div>
             <div class="margin_box">
                 <div class="margin_test">
@@ -92,18 +95,18 @@
 
 
 <script lang="ts">
-import { ref, reactive, nextTick } from 'vue'
+import { ref, reactive, nextTick, onUnmounted } from 'vue';
 import TokenSelect from './TokenSelect.vue'
 import SetTable from './SetTable.vue'
 import { chain2icon, makerToken, chainName } from '../../utils/chain2id'
 import { useQuery } from '@urql/vue';
-import { contract_obj, contractMethod, contract_addr, linkNetwork } from '../../contracts'
+import { contract_obj, contractMethod, contract_addr, linkNetwork } from '../../contracts';
 import { ElNotification, ElLoading } from 'element-plus'
 import { mapState } from 'vuex' 
 import store from '../../store'
 import { MerkleTree } from 'merkletreejs'
 import {Buffer} from 'buffer';
-import { $env } from '@/env'
+import { $env } from '@/env';
  
 export default {
     components: { TokenSelect, SetTable },
@@ -119,6 +122,7 @@ export default {
         const networkList = reactive([])
         const checkNetwork = reactive([])
         const pairsData = reactive([])
+        const lpData = reactive([])
         const tableList = reactive([])
         const isValidate = ref(false)
         const setTable = ref(null)
@@ -128,6 +132,12 @@ export default {
         const result = reactive({})
         const makerAddr = ref("")
         const multipleSelection = reactive([])
+        let timer: any = ref();
+        onUnmounted(async () => {
+            console.log('Clear interval');
+            clearInterval(timer);
+            timer = null;
+        });
         return {
             result,
             isCreate: true,
@@ -143,13 +153,15 @@ export default {
             networkList,
             checkNetwork,
             pairsData,
+            lpData,
             tableList,
             isValidate,
             setTable,
             loading,
             contract_ORMakerDeposit,
             contract_ORProtocalV1,
-            multipleSelection
+            multipleSelection,
+            timer
         }
     },
     async mounted() {
@@ -158,6 +170,12 @@ export default {
         this.getIdleAmount()
         this.loading = false
         this.tokenType = makerToken.find(item => item.chainid == this.tokenItem)
+
+        const self = this;
+        this.timer = setInterval(() => {
+            console.log('Execute timer');
+            self.updateStatus();
+        }, 30000);
     },
     computed: {
         ...mapState(['account', 'isMaker', 'maker']),
@@ -172,6 +190,26 @@ export default {
         },
     },
     methods: {
+        async updateStatus(){
+            if (!this.result || this.result.makerEntities.length == 0) return
+            let data = this.result.makerEntities[0]
+            let actions = data.effectLpIds
+            if(!actions)return
+            let lpList = actions.map(v => data.lps.filter(item => item.id === v));
+            let timer = new Date().getTime() / 1000
+            let contract_manager = await contract_obj('ORManager');
+            lpList.map(async v => {
+                let ebcAddr = await contract_manager.methods.getEBC(v[0].pair.ebcId).call();
+                this.contract_ORProtocalV1 = await contract_obj('ORProtocalV1', ebcAddr);
+                const stopDealyTime = await this.contract_ORProtocalV1.methods.getStopDealyTime(v[0].pair.sourceChain).call();
+                const isStop = timer >= (Number(stopDealyTime) + Number(v[0].stopTime)) ? true : false;
+                const isPause = v[0].status == 1 ? true : false;
+                const tableData = this.tableList.find(item => item.sourceChain == v[0].pair.sourceChain && item.destChain == v[0].pair.destChain &&
+                    item.sourceTAddress == v[0].pair.sourceToken && item.destTAddress == v[0].pair.destToken);
+                tableData.isStop = isStop;
+                tableData.isPause = isPause;
+            });
+        },
         showChainIcon(localChainID) {
             return chain2icon(Number(localChainID))
         },
@@ -184,6 +222,7 @@ export default {
         },
         setMultipleSelection(val) {
             this.multipleSelection = val
+            this.setTabList(this.tableList);
         },
         async getIdleAmount() {
             if(!this.isMaker) return
@@ -203,7 +242,7 @@ export default {
         async setTabList(val) {
             // console.log("val", val)
             this.tableList = val
-            this.setTable.toggleSelection(val)
+            this.setTable.toggleSelection(this.multipleSelection)
             // console.log(this.tableList)
             let needStake = 0
             let contract_manager = await contract_obj('ORManager')
@@ -213,7 +252,7 @@ export default {
                 let ebcAddr = await contract_manager.methods.getEBC(v.ebcId).call()
                 this.contract_ORProtocalV1 = await contract_obj('ORProtocalV1', ebcAddr)
             }))
-            await Promise.all(this.tableList.map(async (v) => {
+            await Promise.all(this.multipleSelection.map(async (v) => {
                 if (v.maxPrice !== '' && v.status == 0) {
                     let chainEntitie = this.result.chainEntities.filter(item => item.id == v.sourceChain)
                     console.log('tokentype ==>', chainEntitie[0].batchLimit, this.$web3.utils.toWei(v.maxPrice + '', 'ether'))
@@ -330,6 +369,12 @@ export default {
                         ebcId
                         id
                     }
+                    lpEntities {
+                        id
+                        pair {
+                          id
+                        }
+                     }
                     makerEntities(where: {id: "${this.maker}"}) {
                         id
                         createdAt
@@ -367,6 +412,7 @@ export default {
             if (this.result) {
                 const data = result.data.value.pairEntities
                 this.pairsData = data
+                this.lpData = result.data.value.lpEntities
                 let tokenType = makerToken.filter(v => v.chainid == tokenid)
                 let pairs = data.filter(v => v.sourceToken == tokenType[0].address)
                 pairs.map(v => {
@@ -374,6 +420,10 @@ export default {
                         this.networkList.push({chainid: v.sourceChain, name: chainName(v.sourceChain), address: v.sourceToken, ebcId: v.ebcId, isCheck: false})
                     }
                 })
+                this.networkList.push({chainid: 599, name: '599(R)', address: '0x0000000000000000000000000000000000000000', ebcId: 1, isCheck: false})
+                this.networkList = this.networkList.sort(function (a, b) {
+                    return a.name.length - b.name.length;
+                });
                 console.log("networkList ==>", this.networkList)
             }
         },
@@ -413,9 +463,9 @@ export default {
                                         ebcid: v.ebcId,
                                         minPrice,
                                         numberMinPrice: Number(this.$web3.utils.fromWei(minPrice + '', 'ether')),
-                                        maxPrice: 1,
+                                        maxPrice: 0.1,
                                         gasFee: 1,
-                                        tradingFee: 1,
+                                        tradingFee: 0.001,
                                         startTime: 0,
                                     })
                                 }
@@ -447,6 +497,7 @@ export default {
                 console.log(this.ethAmount, this.stakeAmount, this.payEth, )
                 
             }
+            this.setTable.toggleSelection(this.tableList)
             loading.close()
         },
         async createMaker() {
@@ -682,31 +733,61 @@ export default {
 
         async lpChange(type, row) {
             let lpInfos = JSON.parse(JSON.stringify(row))
-            
-            delete lpInfos.from
-            delete lpInfos.to
-            delete lpInfos.status
-            delete lpInfos.isStop
-            delete lpInfos.isPause
-            delete lpInfos.isChoose
-            delete lpInfos.numberMinPrice
+            if (type !== 3) {
+                delete lpInfos.from;
+                delete lpInfos.to;
+                delete lpInfos.status;
+                delete lpInfos.isStop;
+                delete lpInfos.isPause;
+                delete lpInfos.isChoose;
+                delete lpInfos.numberMinPrice;
 
-            if (lpInfos instanceof Array) {
-                lpInfos.map(v => {
-                    v.maxPrice = this.$web3.utils.toWei(v.maxPrice + '', 'ether')
-                    v.gasFee = this.$web3.utils.toWei(v.gasFee + '', 'ether')
-                    v.tradingFee = this.$web3.utils.toWei(v.tradingFee + '', 'ether')
+                if (lpInfos instanceof Array) {
+                    lpInfos.map(v => {
+                        v.maxPrice = this.$web3.utils.toWei(v.maxPrice + '', 'ether');
+                        v.gasFee = this.$web3.utils.toWei(v.gasFee + '', 'ether');
+                        v.tradingFee = this.$web3.utils.toWei(v.tradingFee + '', 'ether');
+                    });
+                } else {
+                    lpInfos.maxPrice = this.$web3.utils.toWei(lpInfos.maxPrice + '', 'ether');
+                    lpInfos.gasFee = this.$web3.utils.toWei(lpInfos.gasFee + '', 'ether');
+                    lpInfos.tradingFee = this.$web3.utils.toWei(lpInfos.tradingFee + '', 'ether');
+                }
+            }else {
+                const pairs = JSON.parse(JSON.stringify(this.pairsData));
+                const lpList = JSON.parse(JSON.stringify(this.lpData));
+                const pairList = pairs.filter(item=>{
+                    const dt = lpInfos.find(it=>it.destChain == item.destChain && it.destTAddress == item.destToken &&
+                        it.sourceChain == item.sourceChain && it.sourceTAddress == item.sourceToken);
+                    if(dt)return dt
                 })
-            } else {
-                lpInfos.maxPrice = this.$web3.utils.toWei(lpInfos.maxPrice + '', 'ether')
-                lpInfos.gasFee = this.$web3.utils.toWei(lpInfos.gasFee + '', 'ether')
-                lpInfos.tradingFee = this.$web3.utils.toWei(lpInfos.tradingFee + '', 'ether')
+                const lpDtList: any[] = [];
+                for (const pair of pairList) {
+                    const pid = pair.id;
+                    const lpdt = lpList.find(item => item.pair.id == pid);
+                    if (lpdt) {
+                        lpDtList.push({ pid, lpid: lpdt.id });
+                    }
+                }
+                lpInfos = lpDtList;
             }
-            const loading = ElLoading.service({
-                lock: true,
-                text: 'Loading',
-            })
-            let name = type == 1 ? 'LPPause' : 'LPStop'
+
+            // const loading = ElLoading.service({
+            //     lock: true,
+            //     text: 'Loading',
+            // })
+            let name = '';
+            switch (type) {
+                case 1:
+                    name = 'LPPause';
+                    break;
+                case 2:
+                    name = 'LPStop';
+                    break;
+                case 3:
+                    name = 'LPRestart';
+                    break;
+            }
             let LPData = {
                 name,
                 contractName: "ORMakerDeposit",
@@ -717,7 +798,7 @@ export default {
             const isNetwork = await linkNetwork()
             if (isNetwork) {
                 let res: any = await contractMethod(this.account, LPData).catch(err => {
-                    loading.close()
+                    // loading.close()
                     ElNotification({
                         title: 'Error',
                         message: `Failed transactions: ${err.message}`,
@@ -732,22 +813,45 @@ export default {
                         type: 'success',
                     })
                     setTimeout(() => {
-                        loading.close()
+                        // loading.close()
                         location.reload()
                     }, 10000);
                 }
             } else {
-                loading.close()
+                // loading.close()
             }
         },
 
         async pauseLp(row) {
             await this.lpChange(1, [row])
+            row.loading = false;
         },
 
         async stopLp(row) {
-            await this.lpChange(2, [row])
-        }
+            await this.lpChange(2, [row]);
+            row.loading = false;
+        },
+
+        async restartLp(row) {
+            await this.lpChange(3, [row]);
+            row.loading = false;
+        },
+
+        async selectStopLp(btnInfo) {
+            const selectPauseList = this.multipleSelection.filter(item=>item.status === 2);
+            if (selectPauseList.length){
+                await this.lpChange(2, selectPauseList);
+            }
+            btnInfo.loading = false;
+        },
+
+        async selectRestartLp(btnInfo) {
+            const selectPauseList = this.multipleSelection.filter(item=>item.status === 2);
+            if (selectPauseList.length){
+                await this.lpChange(3, selectPauseList);
+            }
+            btnInfo.loading = false;
+        },
     }
 }
 
