@@ -256,7 +256,13 @@ export default {
                 if (v.maxPrice !== '' && v.status == 0) {
                     let chainEntitie = this.result.chainEntities.filter(item => item.id == v.sourceChain)
                     console.log('tokentype ==>', chainEntitie[0].batchLimit, this.$web3.utils.toWei(v.maxPrice + '', 'ether'))
-                    const needPay = await this.contract_ORProtocalV1.methods.getDepositAmount(chainEntitie[0].batchLimit, this.$web3.utils.toWei(v.maxPrice + '', 'ether')).call()
+                    const {baseValue, additiveValue} = await this.contract_ORProtocalV1.methods.getPledgeAmount(chainEntitie[0].batchLimit, this.$web3.utils.toWei(v.maxPrice + '', 'ether')).call()
+                    const pledgeAmountSafeRate= await this.contract_ORProtocalV1.methods.getPledgeAmountSafeRate().call()
+                    console.log(pledgeAmountSafeRate, '==pledgeAmountSafeRate');
+                    const needPay = Number(baseValue) + Number(additiveValue);
+                    console.log(needPay, '==needPay')
+                    console.log(baseValue, '==baseValue')
+                    console.log(additiveValue, '==additiveValue')
                     if (this.$web3.utils.fromWei(needPay + '', 'ether') >= needStake) {
                         needStake = this.$web3.utils.fromWei(needPay + '', 'ether')
                     }
@@ -420,7 +426,6 @@ export default {
                         this.networkList.push({chainid: v.sourceChain, name: chainName(v.sourceChain), address: v.sourceToken, ebcId: v.ebcId, isCheck: false})
                     }
                 })
-                this.networkList.push({chainid: 599, name: '599(R)', address: '0x0000000000000000000000000000000000000000', ebcId: 1, isCheck: false})
                 this.networkList = this.networkList.sort(function (a, b) {
                     return a.name.length - b.name.length;
                 });
