@@ -118,8 +118,8 @@
                         <el-form-item>
                             <div class="status_btn" :style="row.loading ? 'background-color: #b6b6b5' : ''" v-loading="row.loading">
                                 <span class="status_stop" v-if="row.isStop && row.status == 2" @click="stopLp(row)">Stop</span>
-                                <span class="status_restart" v-if="row.isStop && row.status == 2" @click="restartLp(row)">Restart</span>
                                 <span class="status_stop_not" v-if="!row.isStop && row.status == 2" @click="notStop(row)">Stop</span>
+                                <span class="status_restart" v-if="row.status == 2" @click="restartLp(row)">Restart</span>
                                 <span class="status_pause" v-if="row.isPause && row.status == 1"  @click="pauseLp(row)">Pause</span>
                                 <span class="status_pause_not" v-if="!row.isPause && row.status == 1">Pause</span>
                             </div>
