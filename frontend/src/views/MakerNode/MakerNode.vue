@@ -420,7 +420,6 @@ export default {
                         this.networkList.push({chainid: v.sourceChain, name: chainName(v.sourceChain), address: v.sourceToken, ebcId: v.ebcId, isCheck: false})
                     }
                 })
-                this.networkList.push({chainid: 599, name: '599(R)', address: '0x0000000000000000000000000000000000000000', ebcId: 1, isCheck: false})
                 this.networkList = this.networkList.sort(function (a, b) {
                     return a.name.length - b.name.length;
                 });
