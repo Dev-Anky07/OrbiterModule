@@ -737,7 +737,23 @@ export default {
         },
 
         async lpChange(type, row) {
-            let lpInfos = JSON.parse(JSON.stringify(row))
+            let lpInfos = row.map((item)=>{
+                return {
+                    sourceChain: item.sourceChain,
+                    destChain: item.destChain,
+                    sourceTAddress: item.sourceTAddress,
+                    destTAddress: item.destTAddress,
+                    ebcid: item.ebcid,
+                    sourcePresion: item.sourcePresion,
+                    destPresion: item.destPresion,
+                    minPrice: item.minPrice,
+                    maxPrice: item.maxPrice,
+                    gasFee: item.gasFee,
+                    tradingFee: item.tradingFee,
+                    startTime: item.startTime,
+                    stopTime: item.stopTime
+                }
+            })
             if (type !== 3) {
                 delete lpInfos.from;
                 delete lpInfos.to;
