@@ -334,7 +334,6 @@ export default {
       this.tokenType = makerToken.find((item) => item.chainid == val)
     },
     setMultipleSelection(val) {
-    console.log(val, '===setMultipleSelection')
       this.multipleSelection = val
       this.setTabList(this.tableList)
     },
@@ -345,11 +344,6 @@ export default {
         await this.contract_ORMakerDeposit.methods
           .idleAmount(tokenType[0].address)
           .call()
-      console.log(
-        makerContractFreeBalance,
-        '==makerContractFreeBalance',
-        tokenType[0].address
-      )
       this.makerContractFreeBalance = this.$web3.utils.fromWei(
         makerContractFreeBalance,
         'ether'
@@ -389,7 +383,6 @@ export default {
           )
         })
       )
-      console.log(this.makerAddr, '==this.makerAddr')
       if (this.makerAddr !== '0x0000000000000000000000000000000000000000') {
         const makerDeposit = await contract_obj(
           'ORMakerDeposit',
@@ -397,7 +390,6 @@ export default {
         )
         const lplist = this.multipleSelection
           .map((row) => {
-            console.log(row, '===row')
             if (row.maxPrice !== '' && row.status == 0) {
               const maxPrice = this.$web3.utils.toWei(
                 row.maxPrice + '',
@@ -427,25 +419,6 @@ export default {
         }
       }
       this.actionLpPayAmount = needStake
-
-      // await Promise.all(this.multipleSelection.map(async (v) => {
-      //     if (v.maxPrice !== '' && v.status == 0) {
-
-      //         // calc
-      //         // let chainEntitie = this.result.chainEntities.filter(item => item.id == v.sourceChain)
-      //         // console.log('tokentype ==>', chainEntitie[0].batchLimit, this.$web3.utils.toWei(v.maxPrice + '', 'ether'))
-      //         // const {baseValue, additiveValue} = await this.contract_ORProtocalV1.methods.getPledgeAmount(chainEntitie[0].batchLimit, this.$web3.utils.toWei(v.maxPrice + '', 'ether')).call()
-      //         // const pledgeAmountSafeRate= await this.contract_ORProtocalV1.methods.getPledgeAmountSafeRate().call()
-      //         // console.log(pledgeAmountSafeRate, '==pledgeAmountSafeRate');
-      //         // const needPay = Number(baseValue) + Number(additiveValue);
-      //         // console.log(needPay, '==needPay')
-      //         // console.log(baseValue, '==baseValue')
-      //         // console.log(additiveValue, '==additiveValue')
-      //         // if (this.$web3.utils.fromWei(needPay + '', 'ether') >= needStake) {
-      //         //     needStake = this.$web3.utils.fromWei(needPay + '', 'ether')
-      //         // }
-      //     }
-      // }))
       // this.ethTotal = needStake
       console.log(this.isMaker, '=this.isMaker')
       console.log('needStake ==>', needStake, this.makerContractFreeBalance)
@@ -505,6 +478,8 @@ export default {
           const isPause = v[0].status == 1 ? true : false
           // console.log('xxxxx ==>', stopDealyTime, isStop, (Number(stopDealyTime) + Number(v[0].stopTime)))
           this.tableList.push({
+            id:  v[0].id,
+            pairId:  v[0].pair.id,
             from: chainName(v[0].pair.sourceChain),
             to: chainName(v[0].pair.destChain),
             status: v[0].status,
@@ -583,12 +558,6 @@ export default {
                         ebcId
                         id
                     }
-                    lpEntities {
-                        id
-                        pair {
-                          id
-                        }
-                     }
                     makerEntities(where: {id: "${this.maker}"}) {
                         id
                         createdAt
@@ -609,6 +578,7 @@ export default {
                             tradingFee
                             status
                             pair {
+                                id
                                 sourceChain
                                 destChain
                                 sourceChain
@@ -687,6 +657,7 @@ export default {
                   )
                   if (!isPushArr) {
                     this.tableList.push({
+                      id: v.id,
                       from: chainName(v.sourceChain),
                       to: chainName(v.destChain),
                       status: 0,
@@ -1002,6 +973,8 @@ export default {
     async lpChange(type, row) {
       let lpInfos = row.map((item)=>{
             return {
+                id: item.id,
+                pairId: item.pairId,
                 sourceChain: item.sourceChain,
                 destChain: item.destChain,
                 sourceTAddress: item.sourceTAddress,
@@ -1018,6 +991,8 @@ export default {
             }
         })
       if (type !== 3) {
+        delete lpInfos.id
+        delete lpInfos.pairId;
         delete lpInfos.from
         delete lpInfos.to
         delete lpInfos.status
@@ -1043,6 +1018,13 @@ export default {
             'ether'
           )
         }
+      } else if(type ===3 ) {
+        lpInfos = lpInfos.map(row=> {
+            return {
+            pid: row.pairId, 
+            lpid: row.id
+            }
+        })
       } else {
         const pairs = JSON.parse(JSON.stringify(this.pairsData))
         const lpList = JSON.parse(JSON.stringify(this.lpData))
@@ -1064,7 +1046,6 @@ export default {
             lpDtList.push({ pid, lpid: lpdt.id })
           }
         }
-        console.log(lpDtList, '==lpDtList')
         lpInfos = lpDtList
       }
 
@@ -1107,7 +1088,7 @@ export default {
         if (res && res.code === 200) {
           ElNotification({
             title: 'Success',
-            message: type == 1 ? `Pause successfully` : `Stop successfully`,
+            message: type == 1 ? `successfully` : `successfully`,
             type: 'success',
           })
             const self = this;
