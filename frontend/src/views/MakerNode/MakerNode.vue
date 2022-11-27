@@ -320,6 +320,7 @@ export default {
         )
         tableData.isStop = isStop
         tableData.isPause = isPause
+        tableData.status = v[0].status
       })
     },
     showChainIcon(localChainID) {
@@ -757,6 +758,12 @@ export default {
           message: `Please select network`,
           type: 'error',
         })
+        if (!this.multipleSelection.length)
+            return ElNotification({
+                title: 'Error',
+                message: `Please select transaction`,
+                type: 'error',
+         })
       this.setTable.handleSubmit()
       if (this.isValidate) {
         console.log('ismaker ==>', this.isMaker)
@@ -845,7 +852,12 @@ export default {
           message: `No idle funds`,
           type: 'error',
         })
-
+        if (!this.multipleSelection.length)
+            return ElNotification({
+                title: 'Error',
+                message: `Please select transaction`,
+                type: 'error',
+            })
       const loading = ElLoading.service({
         lock: true,
         text: 'Loading',
@@ -988,7 +1000,23 @@ export default {
     },
 
     async lpChange(type, row) {
-      let lpInfos = JSON.parse(JSON.stringify(row))
+      let lpInfos = row.map((item)=>{
+            return {
+                sourceChain: item.sourceChain,
+                destChain: item.destChain,
+                sourceTAddress: item.sourceTAddress,
+                destTAddress: item.destTAddress,
+                ebcid: item.ebcid,
+                sourcePresion: item.sourcePresion,
+                destPresion: item.destPresion,
+                minPrice: item.minPrice,
+                maxPrice: item.maxPrice,
+                gasFee: item.gasFee,
+                tradingFee: item.tradingFee,
+                startTime: item.startTime,
+                stopTime: item.stopTime
+            }
+        })
       if (type !== 3) {
         delete lpInfos.from
         delete lpInfos.to
@@ -1082,9 +1110,14 @@ export default {
             message: type == 1 ? `Pause successfully` : `Stop successfully`,
             type: 'success',
           })
+            const self = this;
           setTimeout(() => {
             // loading.close()
-            location.reload()
+            // location.reload()
+              for(const dt of row){
+                  dt.loading = false
+              }
+              self.updateStatus();
           }, 10000)
         }
       } else {
@@ -1094,17 +1127,14 @@ export default {
 
     async pauseLp(row) {
       await this.lpChange(1, [row])
-      row.loading = false
     },
 
     async stopLp(row) {
       await this.lpChange(2, [row])
-      row.loading = false
     },
 
     async restartLp(row) {
       await this.lpChange(3, [row])
-      row.loading = false
     },
 
     async selectStopLp(btnInfo) {
