@@ -314,6 +314,7 @@ export default {
         )
         tableData.isStop = isStop
         tableData.isPause = isPause
+        tableData.status = v[0].status
       })
     },
     showChainIcon(localChainID) {
@@ -966,7 +967,23 @@ export default {
     },
 
     async lpChange(type, row) {
-      let lpInfos = JSON.parse(JSON.stringify(row))
+      let lpInfos = row.map((item)=>{
+            return {
+                sourceChain: item.sourceChain,
+                destChain: item.destChain,
+                sourceTAddress: item.sourceTAddress,
+                destTAddress: item.destTAddress,
+                ebcid: item.ebcid,
+                sourcePresion: item.sourcePresion,
+                destPresion: item.destPresion,
+                minPrice: item.minPrice,
+                maxPrice: item.maxPrice,
+                gasFee: item.gasFee,
+                tradingFee: item.tradingFee,
+                startTime: item.startTime,
+                stopTime: item.stopTime
+            }
+        })
       if (type !== 3) {
         delete lpInfos.from
         delete lpInfos.to
@@ -1061,6 +1078,9 @@ export default {
           })
           setTimeout(() => {
             // loading.close()
+              for(const dt of row){
+                  dt.loading = false
+              }
             location.reload()
           }, 10000)
         }
@@ -1071,17 +1091,14 @@ export default {
 
     async pauseLp(row) {
       await this.lpChange(1, [row])
-      row.loading = false
     },
 
     async stopLp(row) {
       await this.lpChange(2, [row])
-      row.loading = false
     },
 
     async restartLp(row) {
       await this.lpChange(3, [row])
-      row.loading = false
     },
 
     async selectStopLp(btnInfo) {
