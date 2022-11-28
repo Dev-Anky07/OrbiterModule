@@ -948,6 +948,7 @@ export default {
       if (isNetwork) {
         let res: any = await contractMethod(this.account, data).catch((err) => {
           loading.close()
+          console.log(err);
           console.log('err ==>', err.message)
           if (
             err.message == 'Returned error: insufficient funds for transfer'
