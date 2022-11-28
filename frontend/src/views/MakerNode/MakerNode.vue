@@ -465,7 +465,7 @@ export default {
           }
         }
       }
-      this.actionLpPayAmount = needStake
+      this.actionLpPayAmount = Number((needStake).toFixed(6));
       // this.ethTotal = needStake
       console.log(this.isMaker, '=this.isMaker')
       console.log('needStake ==>', needStake, this.makerContractFreeBalance)
