@@ -34,107 +34,107 @@
       </div>
       <div v-if="isMaker">
         <div class="from_title">
-        <span
-        >Set Withholding Fee, Trading Fee and Trasaction Limit for each
-          transaction pair.</span
-        >
+          <span
+            >Set Withholding Fee, Trading Fee and Trasaction Limit for each
+            transaction pair.</span
+          >
         </div>
         <div class="form_box">
           <SetTable
-                  ref="setTable"
-                  :tableList="tableList"
-                  @setMultipleSelection="setMultipleSelection"
-                  @setTabList="setTabList"
-                  @setIsValidate="setIsValidate"
-                  @stopLp="stopLp"
-                  @pauseLp="pauseLp"
-                  @restartLp="restartLp"
-                  @selectStopLp="selectStopLp"
-                  @selectRestartLp="selectRestartLp"
+            ref="setTable"
+            :tableList="tableList"
+            @setMultipleSelection="setMultipleSelection"
+            @setTabList="setTabList"
+            @setIsValidate="setIsValidate"
+            @stopLp="stopLp"
+            @pauseLp="pauseLp"
+            @restartLp="restartLp"
+            @selectStopLp="selectStopLp"
+            @selectRestartLp="selectRestartLp"
           ></SetTable>
         </div>
         <div class="margin_box">
           <div class="margin_test">
             <div>
-            <span style="font-weight: bold; font-size: 16px"
-            >Idle Funds:
-              <span style="color: red">{{ makerContractFreeBalance }}</span>
-              ETH</span
-            >
+              <span style="font-weight: bold; font-size: 16px"
+                >Idle Funds:
+                <span style="color: red">{{ makerContractFreeBalance }}</span>
+                ETH</span
+              >
               <br />
               <span style="font-weight: bold; font-size: 16px"
-              >Pledged Amount:
-              <span style="color: red">{{ pledgedAmount }}</span> ETH</span
+                >Pledged Amount:
+                <span style="color: red">{{ pledgedAmount }}</span> ETH</span
               >
             </div>
 
             <span
-                    style="font-weight: bold; font-size: 16px"
-                    v-if="pageStatus === 1"
-            >The Margin amount you need to deposit in Orbiter Contract:</span
+              style="font-weight: bold; font-size: 16px"
+              v-if="pageStatus === 1"
+              >The Margin amount you need to deposit in Orbiter Contract:</span
             >
 
             <span
-                    style="font-weight: bold; font-size: 16px"
-                    v-if="pageStatus === 2"
-            >The new Margin amount you need to deposit in Orbiter Contract is
-            <span style="color: #df2e2d">{{ ethTotal }} ETH</span>, you need to
-            <span style="color: #df2e2d">add</span> Margin:</span
+              style="font-weight: bold; font-size: 16px"
+              v-if="pageStatus === 2"
+              >The new Margin amount you need to deposit in Orbiter Contract is
+              <span style="color: #df2e2d">{{ ethTotal }} ETH</span>, you need
+              to <span style="color: #df2e2d">add</span> Margin:</span
             >
             <span
-                    style="font-weight: bold; font-size: 16px"
-                    v-if="pageStatus === 3"
-            >The new Margin amount you need to deposit in Orbiter Contract is
-            <span style="color: #df2e2d">{{ ethTotal }} ETH</span>, you need to
-            <span style="color: #df2e2d">reduce</span> Margin:</span
-          >
-        </div>
-        <div class="margin_input clearfix">
-          <div class="margin_input_box">
-            <div class="price" v-if="pageStatus == 1">
-              <span>{{ actionLpPayAmount }}</span>
+              style="font-weight: bold; font-size: 16px"
+              v-if="pageStatus === 3"
+              >The new Margin amount you need to deposit in Orbiter Contract is
+              <span style="color: #df2e2d">{{ ethTotal }} ETH</span>, you need
+              to <span style="color: #df2e2d">reduce</span> Margin:</span
+            >
+          </div>
+          <div class="margin_input clearfix">
+            <div class="margin_input_box">
+              <div class="price" v-if="pageStatus == 1">
+                <span>{{ actionLpPayAmount }}</span>
+              </div>
+              <div class="price" v-if="pageStatus == 2">
+                <span></span><span>{{ actionLpPayAmount }}</span>
+              </div>
+              <div class="price" v-if="pageStatus == 3">
+                <span></span><span>{{ actionLpPayAmount }}</span>
+              </div>
+              <!-- <el-input v-if="pageStatus == 1" class="fl" v-model="payEth" placeholder="" readonly /> -->
+              <span class="fl uint">ETH</span>
             </div>
-            <div class="price" v-if="pageStatus == 2">
-              <span></span><span>{{ actionLpPayAmount }}</span>
-            </div>
-            <div class="price" v-if="pageStatus == 3">
-              <span></span><span>{{ actionLpPayAmount }}</span>
-            </div>
-            <!-- <el-input v-if="pageStatus == 1" class="fl" v-model="payEth" placeholder="" readonly /> -->
-            <span class="fl uint">ETH</span>
           </div>
         </div>
-      </div>
-      <div class="margin_detail">
-        <div class="details_item">
-          <svg-icon
-            :iconName="'sigh-b'"
-            style="width: 16px; height: 16px"
-          ></svg-icon>
-          <span
-            >The Margin is used to send back to the user, when you do not
-            response correctly in time.</span
+        <div class="margin_detail">
+          <div class="details_item">
+            <svg-icon
+              :iconName="'sigh-b'"
+              style="width: 16px; height: 16px"
+            ></svg-icon>
+            <span
+              >The Margin is used to send back to the user, when you do not
+              response correctly in time.</span
             >
           </div>
           <div class="details_item">
             <svg-icon
-                    :iconName="'sigh-b'"
-                    style="width: 16px; height: 16px"
+              :iconName="'sigh-b'"
+              style="width: 16px; height: 16px"
             ></svg-icon>
             <span
-            >You can adjust the Margin amount by modifying the
-            <span style="font-weight: bold">Limit</span> of every transaction
-            pair.
-          </span>
+              >You can adjust the Margin amount by modifying the
+              <span style="font-weight: bold">Limit</span> of every transaction
+              pair.
+            </span>
           </div>
           <div class="details_item">
             <svg-icon
-                    :iconName="'sigh-b'"
-                    style="width: 16px; height: 16px"
+              :iconName="'sigh-b'"
+              style="width: 16px; height: 16px"
             ></svg-icon>
             <span
-            >You can get back the Margin immediately, when you shut down and
-            remove the node.</span
+              >You can get back the Margin immediately, when you shut down and
+              remove the node.</span
             >
           </div>
           <div class="details_title">
@@ -142,53 +142,84 @@
           </div>
           <div class="details_item">
             <svg-icon
-                    :iconName="'sigh-b'"
-                    style="width: 16px; height: 16px"
+              :iconName="'sigh-b'"
+              style="width: 16px; height: 16px"
             ></svg-icon>
             <span
-            >In oder to response to the users in time, you’d better
-            <span style="font-weight: bold"
-            >keep 110 ~180 ETH in the Node Account
-              {{ `${showMakerAddr}` }}</span
-            >
-            as liquidity.
-          </span>
+              >In oder to response to the users in time, you’d better
+              <span style="font-weight: bold"
+                >keep 110 ~180 ETH in the Node Account
+                {{ `${showMakerAddr}` }}</span
+              >
+              as liquidity.
+            </span>
           </div>
           <div class="details_item">
             <svg-icon
-                    :iconName="'sigh-b'"
-                    style="width: 16px; height: 16px"
+              :iconName="'sigh-b'"
+              style="width: 16px; height: 16px"
             ></svg-icon>
             <span
-            >The liquidity does not need to deposit in Orbiter’s contract, it
-            only need keep in your own EOA address.</span
+              >The liquidity does not need to deposit in Orbiter’s contract, it
+              only need keep in your own EOA address.</span
             >
           </div>
         </div>
       </div>
       <div class="agree_box">
         <el-checkbox size="large" @change="agreeClick" />
-          <span>
-              I have read the <a @click="openDoc" style="text-decoration:underline">document</a> and already know the risk.
-          </span>
+        <span>
+          I have read the
+          <a @click="openDoc" style="text-decoration: underline">document</a>
+          and already know the risk.
+        </span>
       </div>
       <div class="margin_btnbox">
-        <div class="margin_btn" :style="!agree ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)' : ''" @click="createMaker(0)" v-if="!isMaker">
+        <div
+          class="margin_btn"
+          :style="
+            !agree
+              ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)'
+              : ''
+          "
+          @click="createMaker(0)"
+          v-if="!isMaker"
+        >
           <span>Confirm and Be a Maker</span>
         </div>
-        <div class="margin_btn" :style="!agree || !selectCount ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)' : ''" @click="createMaker(1)" v-if="isMaker">
+        <div
+          class="margin_btn"
+          :style="
+            !agree || !selectCount
+              ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)'
+              : ''
+          "
+          @click="createMaker(1)"
+          v-if="isMaker"
+        >
           <span>Confirm and Add {{ actionLpPayAmount }} ETH Margin</span>
         </div>
-        <br>
-        <div class="margin_btn" :style="!agree || !selectCount ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)' : ''" @click="reduceStake" v-if="makerContractFreeBalance > 0">
-          <span>Confirm and Reduce {{ makerContractFreeBalance }} ETH Margin</span>
+        <br />
+        <div
+          class="margin_btn"
+          :style="
+            !agree || !selectCount
+              ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)'
+              : ''
+          "
+          @click="reduceStake"
+          v-if="makerContractFreeBalance > 0"
+        >
+          <span
+            >Confirm and Reduce {{ makerContractFreeBalance }} ETH Margin</span
+          >
         </div>
       </div>
-<!--        <div v-else class="margin_btnbox">-->
-<!--          <div class="margin_btn" :style="!agree ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)' : ''" @click="createMaker">-->
-<!--            <span>Confirm and Be a Maker</span>-->
-<!--          </div>-->
-<!--        </div>-->
+      <!--        <div v-else class="margin_btnbox">-->
+      <!--          <div class="margin_btn" :style="!agree ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)' : ''" @click="createMaker">-->
+      <!--            <span>Confirm and Be a Maker</span>-->
+      <!--          </div>-->
+      <!--        </div>-->
     </div>
   </div>
 </template>
@@ -276,7 +307,7 @@ export default {
       contract_ORProtocalV1,
       multipleSelection,
       timer,
-      selectCount
+      selectCount,
     }
   },
   async mounted() {
@@ -289,7 +320,7 @@ export default {
     const self = this
     this.timer = setInterval(() => {
       console.log('Execute timer')
-      if (self.isMaker) self.updateStatus();
+      if (self.isMaker) self.updateStatus()
     }, 30000)
   },
   computed: {
@@ -306,7 +337,7 @@ export default {
   },
   methods: {
     openDoc() {
-      window.open('https://docs.orbiter.finance');
+      window.open('https://docs.orbiter.finance')
     },
     async updateStatus() {
       if (!this.result || this.result.makerEntities.length == 0) return
@@ -317,13 +348,13 @@ export default {
       let timer = new Date().getTime() / 1000
       let contract_manager = await contract_obj('ORManager')
       lpList.map(async (v) => {
-        let ebcAddr = await contract_manager.methods
-          .ebc(v[0].pair.ebcId)
-          .call()
-          console.log(v[0], '===')
+        let ebcAddr = await contract_manager.methods.ebc(v[0].pair.ebcId).call()
+        console.log(v[0], '===')
         this.contract_ORProtocalV1 = await contract_obj('ORProtocalV1', ebcAddr)
-        const chainInfo = await contract_manager.methods.getChainInfoByChainID(v[0].pair.sourceChain).call();
-        const stopDealyTime = Number(chainInfo.stopDelayTime);
+        const chainInfo = await contract_manager.methods
+          .getChainInfoByChainID(v[0].pair.sourceChain)
+          .call()
+        const stopDealyTime = Number(chainInfo.stopDelayTime)
         const isStop =
           timer >= Number(stopDealyTime) + Number(v[0].stopTime) ? true : false
         const isPause = v[0].status == 1 ? true : false
@@ -484,16 +515,18 @@ export default {
             'ORProtocalV1',
             ebcAddr
           )
-          const chainInfo = await contract_manager.methods.getChainInfoByChainID(v[0].pair.sourceChain).call();
-          const stopDealyTime = Number(chainInfo.stopDelayTime);
+          const chainInfo = await contract_manager.methods
+            .getChainInfoByChainID(v[0].pair.sourceChain)
+            .call()
+          const stopDealyTime = Number(chainInfo.stopDelayTime)
           const isStop =
             timer >= Number(stopDealyTime) + Number(v[0].stopTime)
               ? true
               : false
           const isPause = v[0].status == 1 ? true : false
           this.tableList.push({
-            id:  v[0].id,
-            pairId:  v[0].pair.id,
+            id: v[0].id,
+            pairId: v[0].pair.id,
             from: chainName(v[0].pair.sourceChain),
             to: chainName(v[0].pair.destChain),
             status: v[0].status,
@@ -709,12 +742,16 @@ export default {
         let modeArr = this.tableList.map((v) => v)
         modeArr.forEach((v) => {
           if (v.sourceChain == item.chainid && v.status == 0) {
-              const idx = this.tableList.indexOf(v);
-              const data = this.tableList[idx];
-              const mIdx = this.multipleSelection.findIndex(item=>item.sourceChain == data.sourceChain &&
-                  item.sourceTAddress == data.sourceTAddress && item.destChain == data.destChain
-              && item.destTAddress == data.destTAddress);
-              this.multipleSelection.splice(mIdx, 1)
+            const idx = this.tableList.indexOf(v)
+            const data = this.tableList[idx]
+            const mIdx = this.multipleSelection.findIndex(
+              (item) =>
+                item.sourceChain == data.sourceChain &&
+                item.sourceTAddress == data.sourceTAddress &&
+                item.destChain == data.destChain &&
+                item.destTAddress == data.destTAddress
+            )
+            this.multipleSelection.splice(mIdx, 1)
             this.tableList.splice(idx, 1)
           }
         })
@@ -743,14 +780,14 @@ export default {
           message: `No consent agreement`,
           type: 'error',
         })
-        if(isAddLp && !this.multipleSelection.length){
-            return ElNotification({
-                title: 'Error',
-                message: `Please select transaction`,
-                type: 'error',
-            })
-        }
-      if(isAddLp) this.setTable.handleSubmit()
+      if (isAddLp && !this.multipleSelection.length) {
+        return ElNotification({
+          title: 'Error',
+          message: `Please select transaction`,
+          type: 'error',
+        })
+      }
+      if (isAddLp) this.setTable.handleSubmit()
       if (!isAddLp || this.isValidate) {
         console.log('ismaker ==>', this.isMaker)
         if (!this.isMaker) {
@@ -801,7 +838,7 @@ export default {
           loading.close()
           if (!isCreate) return
           await this.getMaker()
-          await this.addLp()
+          // await this.addLp()
         } else {
           this.addLp()
         }
@@ -838,12 +875,12 @@ export default {
           message: `No idle funds`,
           type: 'error',
         })
-        if (!this.multipleSelection.length)
-            return ElNotification({
-                title: 'Error',
-                message: `Please select transaction`,
-                type: 'error',
-            })
+      if (!this.multipleSelection.length)
+        return ElNotification({
+          title: 'Error',
+          message: `Please select transaction`,
+          type: 'error',
+        })
       const loading = ElLoading.service({
         lock: true,
         text: 'Loading',
@@ -940,7 +977,7 @@ export default {
       console.log(args)
 
       let data = {
-        name: 'LPAction',
+        name: 'lpAction',
         contractName: 'ORMakerDeposit',
         contractAddr: this.makerAddr,
         value: this.$web3.utils.toWei(this.payEth + '', 'ether'),
@@ -949,10 +986,9 @@ export default {
       console.log('lp add data ==>', data, this.account, this.makerAddr)
       const isNetwork = await linkNetwork()
       if (isNetwork) {
-
         let res: any = await contractMethod(this.account, data).catch((err) => {
           loading.close()
-          console.log(err);
+          console.log(err)
           console.log('err ==>', err.message)
           if (
             err.message == 'Returned error: insufficient funds for transfer'
@@ -988,28 +1024,28 @@ export default {
     },
 
     async lpChange(type, row) {
-      let lpInfos = row.map((item)=>{
-            return {
-                id: item.id,
-                pairId: item.pairId,
-                sourceChain: item.sourceChain,
-                destChain: item.destChain,
-                sourceTAddress: item.sourceTAddress,
-                destTAddress: item.destTAddress,
-                ebcid: item.ebcid,
-                sourcePresion: item.sourcePresion,
-                destPresion: item.destPresion,
-                minPrice: item.minPrice,
-                maxPrice: item.maxPrice,
-                gasFee: item.gasFee,
-                tradingFee: item.tradingFee,
-                startTime: item.startTime,
-                stopTime: item.stopTime
-            }
-        })
+      let lpInfos = row.map((item) => {
+        return {
+          id: item.id,
+          pairId: item.pairId,
+          sourceChain: item.sourceChain,
+          destChain: item.destChain,
+          sourceTAddress: item.sourceTAddress,
+          destTAddress: item.destTAddress,
+          ebcid: item.ebcid,
+          sourcePresion: item.sourcePresion,
+          destPresion: item.destPresion,
+          minPrice: item.minPrice,
+          maxPrice: item.maxPrice,
+          gasFee: item.gasFee,
+          tradingFee: item.tradingFee,
+          startTime: item.startTime,
+          stopTime: item.stopTime,
+        }
+      })
       if (type !== 3) {
         delete lpInfos.id
-        delete lpInfos.pairId;
+        delete lpInfos.pairId
         delete lpInfos.from
         delete lpInfos.to
         delete lpInfos.status
@@ -1035,13 +1071,16 @@ export default {
             'ether'
           )
         }
-      } else if(type ===3 ) {
-        lpInfos = lpInfos.map(row=> {
-            return {
-            pid: row.pairId, 
-            lpid: row.id
-            }
+      } else if (type === 3) {
+        lpInfos = lpInfos.map((row) => {
+          return {
+            pid: row.pairId,
+            lpid: row.id,
+            gasFee: this.$web3.utils.toWei(row.gasFee + '', 'ether'),
+            tradingFee: this.$web3.utils.toWei(row.tradingFee + '', 'ether'),
+          }
         })
+        console.log(lpInfos, '==lpInfos restart')
       } else {
         const pairs = JSON.parse(JSON.stringify(this.pairsData))
         const lpList = JSON.parse(JSON.stringify(this.lpData))
@@ -1073,13 +1112,13 @@ export default {
       let name = ''
       switch (type) {
         case 1:
-          name = 'LPPause'
+          name = 'lpPause'
           break
         case 2:
-          name = 'LPStop'
+          name = 'lpStop'
           break
         case 3:
-          name = 'LPRestart'
+          name = 'lpRestart'
           break
       }
       let LPData = {
@@ -1089,12 +1128,12 @@ export default {
         arguments: [lpInfos],
       }
       console.log('LPData ==>', LPData, this.account, this.makerAddr)
-        const self = this;
+      const self = this
       const isNetwork = await linkNetwork()
       if (isNetwork) {
         let res: any = await contractMethod(this.account, LPData).catch(
           (err) => {
-              self.close(row)
+            self.close(row)
             ElNotification({
               title: 'Error',
               message: `Failed transactions: ${err.message}`,
@@ -1111,22 +1150,22 @@ export default {
           })
 
           setTimeout(() => {
-              self.close(row)
-              location.reload();
-              // self.updateStatus();
+            self.close(row)
+            location.reload()
+            // self.updateStatus();
           }, 10000)
-        }else{
-            this.close(row);
+        } else {
+          this.close(row)
         }
       } else {
-          this.close(row);
+        this.close(row)
       }
     },
-      close(row){
-          for(const dt of row){
-              dt.loading = false
-          }
-      },
+    close(row) {
+      for (const dt of row) {
+        dt.loading = false
+      }
+    },
 
     async pauseLp(row) {
       await this.lpChange(1, [row])
