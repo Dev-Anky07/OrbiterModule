@@ -66,6 +66,12 @@
                 >Pledged Amount:
                 <span style="color: red">{{ pledgedAmount }}</span> ETH</span
               >
+              <br />
+              <span style="font-weight: bold; font-size: 16px"
+                >ChallengePledged Amount:
+                <span style="color: red">{{ challengePledgedAmount }}</span> ETH</span
+              >
+              
             </div>
 
             <span
@@ -254,7 +260,7 @@ export default {
     const makerContractFreeBalance = ref(0)
     const actionLpPayAmount = ref(0)
     const pledgedAmount = ref(0)
-
+    const challengePledgedAmount = ref(0);
     const ethAmount = ref(0)
     const stakeAmount = ref(0)
     const tokenItem = ref(1)
@@ -288,6 +294,7 @@ export default {
       payEth,
       actionLpPayAmount,
       pledgedAmount,
+      challengePledgedAmount,
       makerContractFreeBalance,
       ethAmount,
       stakeAmount,
@@ -459,7 +466,6 @@ export default {
           needStake = Number(
             this.$web3.utils.fromWei(result.totalPledgeValue + '', 'ether')
           )
-          console.log(result, '=ok=result')
           if (needStake > 0) {
             needStake = needStake + (needStake * 10) / 100
           }
@@ -583,6 +589,11 @@ export default {
           'ORMakerDeposit',
           this.makerAddr
         )
+        try {
+          this.challengePledgedAmount = this.contract_ORMakerDeposit.methods.challengePleged().call();
+        } catch(error) {
+          console.error('challengePleged error', error);
+        }
         // let banlance = await this.$web3.eth.getBalance(this.makerAddr)
         // console.log("makerAddr balance ==>", this.$web3.utils.fromWei(banlance, 'ether'))
         this.getMakerInfo()

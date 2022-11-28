@@ -1,6 +1,6 @@
 import { BigNumber } from 'bignumber.js'
 import { Repository } from 'typeorm'
-import { equals, padStart } from 'orbiter-chaincore/src/utils/core'
+import { equals, padStart, uniq } from 'orbiter-chaincore/src/utils/core'
 import { makerConfig } from '../config'
 import { ServiceError, ServiceErrorCodes } from '../error/service'
 import { MakerNode } from '../model/maker_node'
@@ -17,6 +17,7 @@ import {
 import { CHAIN_INDEX, getPTextFromTAmount } from '../util/maker/core'
 import { exchangeToUsd } from './coinbase'
 import dayjs from 'dayjs'
+import { MakerUtil } from '../util/maker/maker_util'
 
 const repositoryMakerNode = (): Repository<MakerNode> => {
   return Core.db.getRepository(MakerNode)
@@ -30,15 +31,14 @@ const repositoryMakerNodeTodo = (): Repository<MakerNodeTodo> => {
  * @returns
  */
 export async function getMakerAddresses() {
-  const makerList = await getMakerList()
-
-  const makerAddresses: string[] = []
-  for (const item of makerList) {
-    if (makerAddresses.indexOf(item.sender) > -1) {
-      continue
-    }
-    makerAddresses.push(item.sender)
-  }
+  // const makerList = await getMakerList()
+  const makerAddresses: string[] = uniq(MakerUtil.makerList.map(row=> row.recipient) || []);
+  // for (const item of makerList) {
+  //   if (makerAddresses.indexOf(item.sender) > -1) {
+  //     continue
+  //   }
+  //   makerAddresses.push(item.sender)
+  // }
 
   return makerAddresses
 }
