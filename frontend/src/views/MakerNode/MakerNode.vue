@@ -318,10 +318,10 @@ export default {
         let ebcAddr = await contract_manager.methods
           .ebc(v[0].pair.ebcId)
           .call()
+          console.log(v[0], '===')
         this.contract_ORProtocalV1 = await contract_obj('ORProtocalV1', ebcAddr)
-        const stopDealyTime = await this.contract_ORProtocalV1.methods
-          .getStopDealyTime(v[0].pair.sourceChain)
-          .call()
+        const chainInfo = await contract_manager.methods.getChainInfoByChainID(v[0].pair.sourceChain).call();
+        const stopDealyTime = Number(chainInfo.stopDelayTime);
         const isStop =
           timer >= Number(stopDealyTime) + Number(v[0].stopTime) ? true : false
         const isPause = v[0].status == 1 ? true : false
@@ -482,15 +482,13 @@ export default {
             'ORProtocalV1',
             ebcAddr
           )
-          const stopDealyTime = await this.contract_ORProtocalV1.methods
-            .getStopDealyTime(v[0].pair.sourceChain)
-            .call()
+          const chainInfo = await contract_manager.methods.getChainInfoByChainID(v[0].pair.sourceChain).call();
+          const stopDealyTime = Number(chainInfo.stopDelayTime);
           const isStop =
             timer >= Number(stopDealyTime) + Number(v[0].stopTime)
               ? true
               : false
           const isPause = v[0].status == 1 ? true : false
-          // console.log('xxxxx ==>', stopDealyTime, isStop, (Number(stopDealyTime) + Number(v[0].stopTime)))
           this.tableList.push({
             id:  v[0].id,
             pairId:  v[0].pair.id,
@@ -943,6 +941,7 @@ export default {
       console.log('lp add data ==>', data, this.account, this.makerAddr)
       const isNetwork = await linkNetwork()
       if (isNetwork) {
+
         let res: any = await contractMethod(this.account, data).catch((err) => {
           loading.close()
           console.log(err);

@@ -257,9 +257,8 @@ const notStop = async (item) => {
         text: 'Loading',
     })
     const contract_manager = await contract_obj('ORManager')
-    let ebcAddr = await contract_manager.methods.ebc(item.ebcid).call()
-    const contract_ORProtocalV1 = await contract_obj('ORProtocalV1', ebcAddr)
-    const stopDealyTime = await contract_ORProtocalV1.methods.getStopDealyTime(item.sourceChain).call()
+    const chainInfo = await contract_manager.methods.getChainInfoByChainID(item.sourceChain).call();
+    const stopDealyTime = Number(chainInfo.stopDelayTime);
     const stopTime = (Number(stopDealyTime) + Number(item.stopTime))
     const time = util.transferTimeStampToTime(stopTime)
     loading.close()
