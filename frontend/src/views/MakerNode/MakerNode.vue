@@ -316,7 +316,7 @@ export default {
       let contract_manager = await contract_obj('ORManager')
       lpList.map(async (v) => {
         let ebcAddr = await contract_manager.methods
-          .getEBC(v[0].pair.ebcId)
+          .ebc(v[0].pair.ebcId)
           .call()
         this.contract_ORProtocalV1 = await contract_obj('ORProtocalV1', ebcAddr)
         const stopDealyTime = await this.contract_ORProtocalV1.methods
@@ -390,7 +390,7 @@ export default {
 
       await Promise.all(
         this.checkNetwork.map(async (v) => {
-          let ebcAddr = await contract_manager.methods.getEBC(v.ebcId).call()
+          let ebcAddr = await contract_manager.methods.ebc(v.ebcId).call()
           this.contract_ORProtocalV1 = await contract_obj(
             'ORProtocalV1',
             ebcAddr
