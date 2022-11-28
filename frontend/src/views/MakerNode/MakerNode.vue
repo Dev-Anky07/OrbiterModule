@@ -289,7 +289,7 @@ export default {
     const self = this
     this.timer = setInterval(() => {
       console.log('Execute timer')
-      self.updateStatus()
+      if (self.isMaker) self.updateStatus();
     }, 30000)
   },
   computed: {
@@ -383,7 +383,6 @@ export default {
       //   console.log('amount ==>', this.makerContractFreeBalance, this.stakeAmount)
     },
     async setTabList(val) {
-      // console.log("val", val)
       this.tableList = val
       this.setTable.toggleSelection(this.multipleSelection)
       // console.log(this.tableList)
@@ -712,7 +711,13 @@ export default {
         let modeArr = this.tableList.map((v) => v)
         modeArr.forEach((v) => {
           if (v.sourceChain == item.chainid && v.status == 0) {
-            this.tableList.splice(this.tableList.indexOf(v), 1)
+              const idx = this.tableList.indexOf(v);
+              const data = this.tableList[idx];
+              const mIdx = this.multipleSelection.findIndex(item=>item.sourceChain == data.sourceChain &&
+                  item.sourceTAddress == data.sourceTAddress && item.destChain == data.destChain
+              && item.destTAddress == data.destTAddress);
+              this.multipleSelection.splice(mIdx, 1)
+            this.tableList.splice(idx, 1)
           }
         })
         if (this.makerContractFreeBalance > this.stakeAmount) {
