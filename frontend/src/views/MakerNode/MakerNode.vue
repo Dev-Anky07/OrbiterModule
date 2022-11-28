@@ -203,7 +203,7 @@
         <div
           class="margin_btn"
           :style="
-            !agree || !selectCount
+            !agree
               ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)'
               : ''
           "
@@ -875,12 +875,6 @@ export default {
         return ElNotification({
           title: 'Error',
           message: `No idle funds`,
-          type: 'error',
-        })
-      if (!this.multipleSelection.length)
-        return ElNotification({
-          title: 'Error',
-          message: `Please select transaction`,
           type: 'error',
         })
       const loading = ElLoading.service({
