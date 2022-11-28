@@ -18,7 +18,7 @@
               {{ item.name }}
             </el-menu-item>
           </template>
-          <el-menu-item index="/makerNode" v-show="isLink">
+          <el-menu-item index="/makerNode">
             MakerNode
           </el-menu-item>
         </el-menu>
