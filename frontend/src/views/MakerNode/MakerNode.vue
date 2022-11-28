@@ -176,11 +176,11 @@
         <div class="margin_btn" :style="!agree ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)' : ''" @click="createMaker(0)" v-if="!isMaker">
           <span>Confirm and Be a Maker</span>
         </div>
-        <div class="margin_btn" :style="!agree ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)' : ''" @click="createMaker(1)" v-if="isMaker">
+        <div class="margin_btn" :style="!agree || !selectCount ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)' : ''" @click="createMaker(1)" v-if="isMaker">
           <span>Confirm and Add {{ actionLpPayAmount }} ETH Margin</span>
         </div>
         <br>
-        <div class="margin_btn" :style="!agree ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)' : ''" @click="reduceStake" v-if="makerContractFreeBalance > 0">
+        <div class="margin_btn" :style="!agree || !selectCount ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)' : ''" @click="reduceStake" v-if="makerContractFreeBalance > 0">
           <span>Confirm and Reduce {{ makerContractFreeBalance }} ETH Margin</span>
         </div>
       </div>
@@ -242,6 +242,7 @@ export default {
     const makerAddr = ref('')
     const multipleSelection = reactive([])
     const agree = ref(false)
+    const selectCount = ref(0)
     let timer: any = ref()
     onUnmounted(async () => {
       console.log('Clear interval')
@@ -275,6 +276,7 @@ export default {
       contract_ORProtocalV1,
       multipleSelection,
       timer,
+      selectCount
     }
   },
   async mounted() {
@@ -350,6 +352,7 @@ export default {
     setMultipleSelection(val) {
     console.log(val, '===setMultipleSelection')
       this.multipleSelection = val
+      this.selectCount = val.length
       this.setTabList(this.tableList)
     },
     async getIdleAmount() {
