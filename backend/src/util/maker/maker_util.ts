@@ -108,6 +108,25 @@ export function convertChainLPToOldLP(oldLpList: Array<any>): Array<IMarket> {
                 Number(row["startTime"]),
                 Number(row["stopTime"] || 9999999999),
             ];
+            function getChainName(chainId: number) {
+                let chainName = '';
+                switch (Number(chainId)) {
+                    case 5:
+                        chainName = 'rinkeby';
+                        break;
+                    case 33:
+                        chainName = 'zksync_test';
+                        break;
+                    case 77:
+                        chainName = 'optimism_test';
+                        break;
+                    case 516:
+                        chainName = 'arbitrum_test';
+                        break;
+                }
+                return chainName;
+            }
+
             return {
                 id: row["id"],
                 recipient: recipientAddress,
@@ -117,7 +136,7 @@ export function convertChainLPToOldLP(oldLpList: Array<any>): Array<IMarket> {
                 ebcId: pair["ebcId"],
                 fromChain: {
                     id: Number(fromChainId),
-                    name: fromChain.name,
+                    name: getChainName(Number(fromChainId)),
                     tokenAddress: pair.sourceToken,
                     symbol: fromToken?.symbol || "",
                     decimals: Number(row["sourcePresion"]),
@@ -126,7 +145,7 @@ export function convertChainLPToOldLP(oldLpList: Array<any>): Array<IMarket> {
                 },
                 toChain: {
                     id: Number(toChainId),
-                    name: toChain.name,
+                    name: getChainName(Number(toChainId)),
                     tokenAddress: pair.destToken,
                     symbol: toToken?.symbol || "",
                     decimals: Number(row["destPresion"])
@@ -137,8 +156,8 @@ export function convertChainLPToOldLP(oldLpList: Array<any>): Array<IMarket> {
                     makerAddress: recipientAddress,
                     c1ID: fromChainId,
                     c2ID: toChainId,
-                    c1Name: fromChain.name,
-                    c2Name: toChain.name,
+                    c1Name: getChainName(Number(fromChainId)),
+                    c2Name: getChainName(Number(toChainId)),
                     t1Address: pair.sourceToken,
                     t2Address: pair.destToken,
                     tName: fromToken?.symbol,

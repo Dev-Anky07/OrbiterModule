@@ -252,6 +252,7 @@ async function subscribeNewTransaction(newTxList: Array<ITransaction>) {
         (m) =>
           chainCoreUtil.equals(String(m.fromChain.id), fromChain.internalId) &&
           chainCoreUtil.equals(String(m.toChain.id), toChain.internalId) &&
+          chainCoreUtil.equals(String(m.recipient), tx.to) &&
           chainCoreUtil.equals(
             m.fromChain.tokenAddress,
             String(tx.tokenAddress)
@@ -266,7 +267,7 @@ async function subscribeNewTransaction(newTxList: Array<ITransaction>) {
       }
       if (!chainCoreUtil.equals(tx.to, marketItem.recipient)) {
         accessLogger.error(
-          `The recipient of the transaction is not a maker address ${tx.hash}`
+          `The recipient of the transaction is not a maker address ${marketItem.id} ${tx.hash}`
         )
         continue
       }
