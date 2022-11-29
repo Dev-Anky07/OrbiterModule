@@ -645,7 +645,7 @@ export default {
           }
         })
         this.networkList = this.networkList.sort(function (a, b) {
-          return a.name.length - b.name.length
+          return a.chainid - b.chainid
         })
       }
     },
