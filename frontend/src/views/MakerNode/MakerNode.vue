@@ -356,7 +356,6 @@ export default {
       let contract_manager = await contract_obj('ORManager')
       lpList.map(async (v) => {
         let ebcAddr = await contract_manager.methods.ebc(v[0].pair.ebcId).call()
-        console.log(v[0], '===')
         this.contract_ORProtocalV1 = await contract_obj('ORProtocalV1', ebcAddr)
         const chainInfo = await contract_manager.methods
           .getChainInfoByChainID(v[0].pair.sourceChain)
@@ -463,6 +462,7 @@ export default {
           const result = await makerDeposit.methods
             .calcLpPledgeAmount(lplist)
             .call()
+          console.log(result, '=result');
           needStake = Number(
             this.$web3.utils.fromWei(result.totalPledgeValue + '', 'ether')
           )
@@ -590,7 +590,7 @@ export default {
           this.makerAddr
         )
         try {
-          this.challengePledgedAmount = this.contract_ORMakerDeposit.methods.challengePleged().call();
+          this.challengePledgedAmount = await this.contract_ORMakerDeposit.methods.challengePleged().call();
         } catch(error) {
           console.error('challengePleged error', error);
         }
