@@ -31,7 +31,7 @@
         "components": [
           {
             "internalType": "uint256",
-            "name": "chanllengeState",
+            "name": "challengeState",
             "type": "uint256"
           },
           {
@@ -71,8 +71,8 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct OperationsLib.chanllengeInfo",
-        "name": "chanllenge",
+        "internalType": "struct OperationsLib.challengeInfo",
+        "name": "challenge",
         "type": "tuple"
       },
       {
@@ -144,7 +144,7 @@
         "type": "tuple"
       }
     ],
-    "name": "LogChanllengeInfo",
+    "name": "LogChallengeInfo",
     "type": "event"
   },
   {
@@ -166,7 +166,7 @@
         "components": [
           {
             "internalType": "uint256",
-            "name": "chanllengeState",
+            "name": "challengeState",
             "type": "uint256"
           },
           {
@@ -206,12 +206,12 @@
           }
         ],
         "indexed": false,
-        "internalType": "struct OperationsLib.chanllengeInfo",
-        "name": "chanllenge",
+        "internalType": "struct OperationsLib.challengeInfo",
+        "name": "challenge",
         "type": "tuple"
       }
     ],
-    "name": "LogChanllengerMakeGood",
+    "name": "LogChallengerMakeGood",
     "type": "event"
   },
   {
@@ -654,14 +654,27 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "challengePleged",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "chanllengeID",
+        "name": "challengeID",
         "type": "bytes32"
       }
     ],
-    "name": "chanllengerMakeGood",
+    "name": "challengerMakeGood",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1255,7 +1268,7 @@
         "type": "bytes32[]"
       }
     ],
-    "name": "makerChanllenger",
+    "name": "makerChallenger",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -1448,7 +1461,7 @@
         "type": "bytes32[]"
       }
     ],
-    "name": "userChanllenge",
+    "name": "userChallenge",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
