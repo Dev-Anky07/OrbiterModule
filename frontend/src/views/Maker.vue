@@ -188,6 +188,7 @@
         +{{ statistics.profit['CNY'] }} CNY
       </div>
       <div style="margin-left: auto">
+        <el-button size="small" round style="margin-right: 10px">Maker Arbitration</el-button>
         <router-link
           :to="`/maker/history?makerAddress=${makerAddressSelected}`"
           target="_blank"

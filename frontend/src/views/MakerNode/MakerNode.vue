@@ -1337,6 +1337,7 @@ export default {
       }
     }
     .agree_box {
+      margin-top: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1346,7 +1347,7 @@ export default {
     }
     .margin_btnbox {
       width: 100%;
-      margin-top: 25px;
+      margin-top: 20px;
       .margin_btn {
         margin: auto;
         width: 490px;
