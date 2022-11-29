@@ -23,7 +23,7 @@
                 </el-table-column>
                 <el-table-column prop="maxPrice" width="150">
                     <template #header>
-                        <div style="text-align: center">
+                        <div style="text-align: left">
                             Limit
                             <el-tooltip class="item" effect="light"
                                         content="The limit of the maximum sending amount of an transaction. (The minimum amount is 0.005). "
@@ -46,9 +46,9 @@
                         </div>
                     </template>
                 </el-table-column>
-                <el-table-column prop="tradingFee" width="150">
+                <el-table-column prop="tradingFee" width="180">
                     <template #header>
-                        <div style="text-align: center">
+                        <div style="text-align: left;">
                              Withholding Fee
                             <el-tooltip class="item" effect="light"
                                         content="An upfront fee to cover the gas fee for transfers to the destination network(Depending on the destination network). "
@@ -73,7 +73,7 @@
                 </el-table-column>
                 <el-table-column prop="gasFee" width="150">
                     <template #header>
-                        <div style="text-align: center">
+                        <div style="text-align: left">
                             Trading Fee
                             <el-tooltip class="item" effect="light"
                                         content="After the transfer is completed, you can get a certain reward according to the percentage of the transfer amount."
@@ -97,7 +97,12 @@
                     </template>
                 </el-table-column>
              
-                <el-table-column prop="status" width="100px" label="Status">
+                <el-table-column prop="status" width="100px" align="center" header-align="center">
+                    <template #header>
+                        <div style="text-align: center">
+                            Status
+                        </div>
+                    </template>
                     <template #default="{ row }">
                         <el-form-item>
                             <div class="status_btn">
@@ -108,7 +113,7 @@
                         </el-form-item>
                     </template>
                 </el-table-column>
-                <el-table-column prop="status" width="200" align="center">
+                <el-table-column prop="status" width="170" align="center">
                     <template #header>
                         <div style="text-align: center">
                             Operation
@@ -337,6 +342,10 @@ watch(() => tableData, (newVal: any[]) => {
         /*}*/
     }
     .status_btn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
         /*width: 100%;*/
         /*background-color: #b6b6b5*/
     }

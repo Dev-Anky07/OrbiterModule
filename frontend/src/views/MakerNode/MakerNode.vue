@@ -760,7 +760,7 @@ export default {
       if (isAddLp && !this.multipleSelection.length) {
         return ElNotification({
           title: 'Error',
-          message: `Please select transaction`,
+          message: `Please select transaction pair`,
           type: 'error',
         })
       }
@@ -1163,7 +1163,7 @@ export default {
 .MakerNode {
   color: #333333;
   width: 1000px;
-  padding: 25px 40px 55px 40px;
+  padding: 25px 40px 40px 40px;
   background: #ffffff;
   border-radius: 20px;
   margin: auto;
@@ -1298,7 +1298,7 @@ export default {
       }
     }
     .agree_box {
-      margin-top: 40px;
+      margin-top: 80px;
       display: flex;
       align-items: center;
       justify-content: center;
