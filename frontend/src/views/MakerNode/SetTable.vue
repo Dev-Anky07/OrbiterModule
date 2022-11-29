@@ -25,9 +25,14 @@
                     <template #header>
                         <div style="text-align: left">
                             Limit
-                            <el-tooltip class="item" effect="light"
-                                        content="The limit of the maximum sending amount of an transaction. (The minimum amount is 0.005). "
+                            <el-tooltip effect="light"
                                         placement="top">
+                                <template #content>
+                                    <div class="tool_tip">
+                                        The limit of the maximum sending amount of an transaction. <br>
+                                        (The minimum amount is 0.005).
+                                    </div>
+                                </template>
                                 <svg-icon :iconName="'sigh-a'"
                                           style="width: 16px; height: 16px;vertical-align: -0.2rem"></svg-icon>
                             </el-tooltip>
@@ -51,8 +56,12 @@
                         <div style="text-align: left;">
                              Withholding Fee
                             <el-tooltip class="item" effect="light"
-                                        content="An upfront fee to cover the gas fee for transfers to the destination network(Depending on the destination network). "
                                         placement="top">
+                                <template #content>
+                                    <div class="tool_tip" style="width: 250px">
+                                        An upfront fee to cover the gas fee for transfers to the destination network.<br>(Depending on the destination network).
+                                    </div>
+                                </template>
                                 <svg-icon :iconName="'sigh-a'"
                                           style="width: 16px; height: 16px;vertical-align: -0.2rem"></svg-icon>
                             </el-tooltip>
@@ -76,8 +85,12 @@
                         <div style="text-align: left">
                             Trading Fee
                             <el-tooltip class="item" effect="light"
-                                        content="After the transfer is completed, you can get a certain reward according to the percentage of the transfer amount."
                                         placement="top">
+                                <template #content>
+                                    <div class="tool_tip">
+                                        After the transfer is completed, you can get a certain reward according to the percentage of the transfer amount.
+                                    </div>
+                                </template>
                                 <svg-icon :iconName="'sigh-a'"
                                           style="width: 16px; height: 16px;vertical-align: -0.2rem"></svg-icon>
                             </el-tooltip>
@@ -133,7 +146,7 @@
                 </el-table-column>
             </el-table>
         </el-form>
-        <div :style="'width:400px;text-align: center;' + (btnInfo.loading ? 'background-color: #b6b6b5' : '')" v-loading="btnInfo.loading">
+        <div :style="'width:400px;text-align: center;margin-top:30px' + (btnInfo.loading ? 'background-color: #b6b6b5' : '')" v-loading="btnInfo.loading">
             <span :class="isSelectPause ? 'status_stop' : 'status_stop_not'" style="width: 150px;" @click="selectStopLp()">Select Stop</span>
             <span :class="isSelectPause ? 'status_restart' : 'status_stop_not'" style="width: 150px" @click="selectRestartLp()">Select Restart</span>
         </div>
@@ -311,6 +324,13 @@ watch(() => tableData, (newVal: any[]) => {
 </script>
 
 <style lang="scss" scoped>
+.tool_tip {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    padding: 5px 5px 5px 20px;
+    width: 200px;
+}
 .table_box {
     .from_item {
         height: 20px;
