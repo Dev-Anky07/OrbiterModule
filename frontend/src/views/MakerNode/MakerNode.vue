@@ -282,7 +282,6 @@ export default {
     const selectCount = ref(0)
     let timer: any = ref()
     onUnmounted(async () => {
-      console.log('Clear interval')
       clearInterval(timer)
       timer = null
     })
@@ -326,7 +325,6 @@ export default {
 
     const self = this
     this.timer = setInterval(() => {
-      console.log('Execute timer')
       if (self.isMaker) self.updateStatus()
     }, 30000)
   },
@@ -356,7 +354,6 @@ export default {
       let contract_manager = await contract_obj('ORManager')
       lpList.map(async (v) => {
         let ebcAddr = await contract_manager.methods.ebc(v[0].pair.ebcId).call()
-        console.log(v[0], '===')
         this.contract_ORProtocalV1 = await contract_obj('ORProtocalV1', ebcAddr)
         const chainInfo = await contract_manager.methods
           .getChainInfoByChainID(v[0].pair.sourceChain)
@@ -408,25 +405,12 @@ export default {
         .getPledgeBalance(tokenType[0].address)
         .call()
       this.pledgedAmount = this.$web3.utils.fromWei(pledgedAmount, 'ether')
-      // let banl = await this.$web3.eth.getBalance(this.makerAddr)
-      // console.log("getBalance ==>", this.$web3.utils.fromWei(banl, 'ether'))
-      //   const stakeAmount = await this.contract_ORMakerDeposit.methods
-      //     .usedDeposit(tokenType[0].address)
-      //     .call()
-      //   this.stakeAmount = this.$web3.utils.fromWei(stakeAmount, 'ether')
-      //   if (this.makerContractFreeBalance > this.stakeAmount) {
-      //     this.payEth = this.makerContractFreeBalance
-      //     this.pageStatus = 3
-      //   }
-      //   console.log('amount ==>', this.makerContractFreeBalance, this.stakeAmount)
     },
     async setTabList(val) {
       this.tableList = val
       this.setTable.toggleSelection(this.multipleSelection)
-      // console.log(this.tableList)
       let needStake = 0
       let contract_manager = await contract_obj('ORManager')
-      // if (this.checkNetwork.length === 0) return
 
       await Promise.all(
         this.checkNetwork.map(async (v) => {
@@ -473,8 +457,6 @@ export default {
       }
       this.actionLpPayAmount = Number((needStake).toFixed(6));
       // this.ethTotal = needStake
-      console.log(this.isMaker, '=this.isMaker')
-      console.log('needStake ==>', needStake, this.makerContractFreeBalance)
       if (this.isMaker) {
         if (Number(needStake) >= Number(this.makerContractFreeBalance)) {
           nextTick(() => {
@@ -492,13 +474,6 @@ export default {
         this.ethTotal = needStake
         this.payEth = this.ethTotal
       }
-      console.log(
-        this.ethTotal,
-        this.ethAmount,
-        needStake,
-        this.payEth,
-        this.stakeAmount
-      )
     },
     setIsValidate(val) {
       this.isValidate = val
@@ -568,7 +543,6 @@ export default {
           //       // this.chooseNetwork({ target: { tagName: 'INPUT' } }, item, index);
           //   }
           // })
-          console.log(this.tableList)
         })
       }
     },
@@ -592,17 +566,14 @@ export default {
           this.makerAddr
         )
         try {
-          this.challengePledgedAmount = this.contract_ORMakerDeposit.methods.challengePleged().call();
+          this.challengePledgedAmount = await this.contract_ORMakerDeposit.methods.challengePleged().call();
         } catch(error) {
           console.error('challengePleged error', error);
         }
-        // let banlance = await this.$web3.eth.getBalance(this.makerAddr)
-        // console.log("makerAddr balance ==>", this.$web3.utils.fromWei(banlance, 'ether'))
         this.getMakerInfo()
       }
     },
     async getNetwrokList(tokenid = 1) {
-      console.log(this.maker)
       const result = await useQuery({
         query: `
                 query MyQuery {
@@ -652,7 +623,6 @@ export default {
                 `,
       })
       this.result = result.data.value
-      console.log('this.result ==>', this.result)
       if (this.result) {
         const data = result.data.value.pairEntities
         this.pairsData = data
@@ -676,7 +646,6 @@ export default {
         this.networkList = this.networkList.sort(function (a, b) {
           return a.name.length - b.name.length
         })
-        console.log('networkList ==>', this.networkList)
       }
     },
     async chooseNetwork(e, item, i) {
@@ -777,11 +746,6 @@ export default {
           this.ethTotal = this.stakeAmount
           this.pageStatus = 2
         }
-        console.log(
-          this.makerContractFreeBalance,
-          this.stakeAmount,
-          this.payEth
-        )
       }
       this.setTable.toggleSelection(this.tableList)
       loading.close()
@@ -802,7 +766,6 @@ export default {
       }
       if (isAddLp) this.setTable.handleSubmit()
       if (!isAddLp || this.isValidate) {
-        console.log('ismaker ==>', this.isMaker)
         if (!this.isMaker) {
           let data = {
             name: 'createMaker',
@@ -815,7 +778,6 @@ export default {
             text: 'Loading',
           })
           let isCreate = false
-          console.log('createmaker ==>', data)
           const isNetwork = await linkNetwork()
           if (isNetwork) {
             let res: any = await contractMethod(this.account, data).catch(
@@ -904,7 +866,6 @@ export default {
           tokenType[0].address,
         ],
       }
-      console.log('lp reduce data ==>', data, this.account, this.makerAddr)
       const isNetwork = await linkNetwork()
       if (isNetwork) {
         let res: any = await contractMethod(this.account, data).catch((err) => {
@@ -934,7 +895,6 @@ export default {
 
     async addLp() {
       let lpInfos = JSON.parse(JSON.stringify(this.multipleSelection))
-      console.log(lpInfos)
       if (lpInfos.length == 0) {
         ElNotification({
           title: 'Error',
@@ -975,13 +935,7 @@ export default {
         lock: true,
         text: 'Loading',
       })
-      lpInfos.map((item) => {
-        item = JSON.parse(JSON.stringify(item))
-        console.log(item)
-      })
-      console.log('lpInfos ==>', lpInfos)
       const args = [lpInfos, pairProof]
-      console.log(args)
 
       let data = {
         name: 'lpAction',
@@ -990,13 +944,11 @@ export default {
         value: this.$web3.utils.toWei(this.payEth + '', 'ether'),
         arguments: args,
       }
-      console.log('lp add data ==>', data, this.account, this.makerAddr)
       const isNetwork = await linkNetwork()
       if (isNetwork) {
         let res: any = await contractMethod(this.account, data).catch((err) => {
           loading.close()
           console.log(err)
-          console.log('err ==>', err.message)
           if (
             err.message == 'Returned error: insufficient funds for transfer'
           ) {
@@ -1087,7 +1039,6 @@ export default {
             tradingFee: this.$web3.utils.toWei(row.tradingFee + '', 'ether'),
           }
         })
-        console.log(lpInfos, '==lpInfos restart')
       } else {
         const pairs = JSON.parse(JSON.stringify(this.pairsData))
         const lpList = JSON.parse(JSON.stringify(this.lpData))
@@ -1134,7 +1085,6 @@ export default {
         contractAddr: this.makerAddr,
         arguments: [lpInfos],
       }
-      console.log('LPData ==>', LPData, this.account, this.makerAddr)
       const self = this
       const isNetwork = await linkNetwork()
       if (isNetwork) {
