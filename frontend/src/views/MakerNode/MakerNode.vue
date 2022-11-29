@@ -209,7 +209,7 @@
         <div
           class="margin_btn"
           :style="
-            !agree || !selectCount
+            !agree
               ? 'background: linear-gradient(90.46deg, #d4d3d3 4.07%, #b6b6b5 98.55%)'
               : ''
           "
@@ -560,12 +560,14 @@ export default {
             startTime: v[0].startTime,
             stopTime: v[0].stopTime,
           })
-          this.networkList.map((item) => {
-            if (item.chainid === v[0].pair.sourceChain && v[0].status == 1) {
-              item.isCheck = true
-              this.checkNetwork.push(item)
-            }
-          })
+          // this.networkList.map((item) => {
+          //   if (item.chainid === v[0].pair.sourceChain && v[0].status == 1) {
+          //     // item.isCheck = true
+          //     // this.checkNetwork.push(item)
+          //       // const index = this.networkList.findIndex(it => it.chainid == item.chainid && it.name == item.name && it.address == item.address)
+          //       // this.chooseNetwork({ target: { tagName: 'INPUT' } }, item, index);
+          //   }
+          // })
           console.log(this.tableList)
         })
       }
@@ -752,18 +754,18 @@ export default {
         this.checkNetwork.splice(this.checkNetwork.indexOf(item), 1)
         let modeArr = this.tableList.map((v) => v)
         modeArr.forEach((v) => {
-          if (v.sourceChain == item.chainid && v.status == 0) {
-            const idx = this.tableList.indexOf(v)
-            const data = this.tableList[idx]
+          if (v.sourceChain == item.chainid) {
+            const idx = this.tableList.indexOf(v);
+            const data = this.tableList[idx];
             const mIdx = this.multipleSelection.findIndex(
-              (item) =>
-                item.sourceChain == data.sourceChain &&
-                item.sourceTAddress == data.sourceTAddress &&
-                item.destChain == data.destChain &&
-                item.destTAddress == data.destTAddress
-            )
-            this.multipleSelection.splice(mIdx, 1)
-            this.tableList.splice(idx, 1)
+                    (item) =>
+                            item.sourceChain == data.sourceChain &&
+                            item.sourceTAddress == data.sourceTAddress &&
+                            item.destChain == data.destChain &&
+                            item.destTAddress == data.destTAddress
+            );
+            this.multipleSelection.splice(mIdx, 1);
+            if (v.status == 0) this.tableList.splice(idx, 1);
           }
         })
         if (this.makerContractFreeBalance > this.stakeAmount) {
@@ -884,12 +886,6 @@ export default {
         return ElNotification({
           title: 'Error',
           message: `No idle funds`,
-          type: 'error',
-        })
-      if (!this.multipleSelection.length)
-        return ElNotification({
-          title: 'Error',
-          message: `Please select transaction`,
           type: 'error',
         })
       const loading = ElLoading.service({
@@ -1352,6 +1348,7 @@ export default {
       }
     }
     .agree_box {
+      margin-top: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1361,7 +1358,7 @@ export default {
     }
     .margin_btnbox {
       width: 100%;
-      margin-top: 25px;
+      margin-top: 20px;
       .margin_btn {
         margin: auto;
         width: 490px;

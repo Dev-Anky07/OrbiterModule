@@ -295,7 +295,9 @@ defineExpose({
 
 watch(() => tableData, (newVal: any[]) => {
     if (newVal?.length != 0) {
-        emits("setTabList", newVal.sort(function (a, b) {
+        emits("setTabList", (newVal.sort(function (a, b) {
+            return a.to.length - b.to.length;
+        })).sort(function (a, b) {
             return a.from.length - b.from.length;
         }));
     }
