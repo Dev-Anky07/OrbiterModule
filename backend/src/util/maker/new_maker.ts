@@ -266,7 +266,7 @@ async function subscribeNewTransaction(newTxList: Array<ITransaction>) {
       }
       if (!chainCoreUtil.equals(tx.to, marketItem.recipient)) {
         accessLogger.error(
-          `The recipient of the transaction is not a maker address ${tx.hash}`
+          `The recipient of the transaction is not a maker address ${marketItem.id} ${tx.hash}`
         )
         continue
       }
