@@ -447,6 +447,7 @@ export default {
           const result = await makerDeposit.methods
             .calcLpPledgeAmount(lplist)
             .call()
+          console.log(result, '=result');
           needStake = Number(
             this.$web3.utils.fromWei(result.totalPledgeValue + '', 'ether')
           )
