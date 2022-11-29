@@ -252,6 +252,7 @@ async function subscribeNewTransaction(newTxList: Array<ITransaction>) {
         (m) =>
           chainCoreUtil.equals(String(m.fromChain.id), fromChain.internalId) &&
           chainCoreUtil.equals(String(m.toChain.id), toChain.internalId) &&
+          chainCoreUtil.equals(String(m.recipient), tx.to) &&
           chainCoreUtil.equals(
             m.fromChain.tokenAddress,
             String(tx.tokenAddress)
