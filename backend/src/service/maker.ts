@@ -14,9 +14,8 @@ import {
   getMakerList,
   sendTransaction,
 } from '../util/maker'
-import { CHAIN_INDEX, getPTextFromTAmount } from '../util/maker/core'
+import { CHAIN_INDEX } from '../util/maker/core'
 import { exchangeToUsd } from './coinbase'
-import dayjs from 'dayjs'
 import { MakerUtil } from '../util/maker/maker_util'
 
 const repositoryMakerNode = (): Repository<MakerNode> => {
