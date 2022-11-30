@@ -567,7 +567,10 @@ export default {
           this.makerAddr
         )
         try {
-          this.challengePledgedAmount = await this.contract_ORMakerDeposit.methods.challengePleged().call();
+          this.challengePledgedAmount = this.$web3.utils.fromWei(
+                  await this.contract_ORMakerDeposit.methods.challengePleged().call(),
+                  'ether'
+          );
         } catch(error) {
           console.error('challengePleged error', error);
         }
