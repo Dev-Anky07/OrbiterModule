@@ -8,3 +8,5 @@ For example, to overwrite the theme color:
 @import "~element-plus/theme-chalk/src/index";
 
 .el-popper{--el-popper-border-radius:var(--el-popover-border-radius, 12px)}
+
+.el-popover{--el-popover-bg-color:var(--el-color-white);--el-popover-font-size:var(--el-font-size-base);--el-popover-border-color:var(--el-border-color-lighter);--el-popover-padding:12px;--el-popover-padding-large:18px 20px;--el-popover-title-font-size:16px;--el-popover-title-text-color:var(--el-text-color-primary);--el-popover-border-radius:12px}

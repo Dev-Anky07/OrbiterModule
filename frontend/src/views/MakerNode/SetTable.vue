@@ -25,17 +25,18 @@
                     <template #header>
                         <div style="text-align: left">
                             Limit
-                            <el-tooltip effect="light"
-                                        placement="top">
-                                <template #content>
+                            <el-popover placement="top" width="max-content" trigger="hover">
+                                <template #default>
                                     <div class="tool_tip">
                                         The limit of the maximum sending amount of an transaction. <br>
                                         (The minimum amount is 0.005).
                                     </div>
                                 </template>
-                                <svg-icon :iconName="'sigh-a'"
-                                          style="width: 16px; height: 16px;vertical-align: -0.2rem"></svg-icon>
-                            </el-tooltip>
+                                <template #reference>
+                                    <svg-icon :iconName="'sigh-a'"
+                                              style="width: 16px; height: 16px;vertical-align: -0.2rem"></svg-icon>
+                                </template>
+                            </el-popover>
                         </div>
                     </template>
                     <template #default="{ row, $index }">
@@ -55,16 +56,17 @@
                     <template #header>
                         <div style="text-align: left;">
                              Withholding Fee
-                            <el-tooltip class="item" effect="light"
-                                        placement="top">
-                                <template #content>
-                                    <div class="tool_tip" style="width: 250px">
+                            <el-popover placement="top" width="max-content" trigger="hover">
+                                <template #default>
+                                    <div class="tool_tip">
                                         An upfront fee to cover the gas fee for transfers to the destination network.<br>(Depending on the destination network).
                                     </div>
                                 </template>
-                                <svg-icon :iconName="'sigh-a'"
-                                          style="width: 16px; height: 16px;vertical-align: -0.2rem"></svg-icon>
-                            </el-tooltip>
+                                <template #reference>
+                                    <svg-icon :iconName="'sigh-a'"
+                                              style="width: 16px; height: 16px;vertical-align: -0.2rem"></svg-icon>
+                                </template>
+                            </el-popover>
                         </div>
                     </template>
                     <template #default="{ row, $index }">
@@ -84,16 +86,17 @@
                     <template #header>
                         <div style="text-align: left">
                             Trading Fee
-                            <el-tooltip class="item" effect="light"
-                                        placement="top">
-                                <template #content>
+                            <el-popover placement="top" width="max-content" trigger="hover">
+                                <template #default>
                                     <div class="tool_tip">
                                         After the transfer is completed, you can get a certain reward according to the percentage of the transfer amount.
                                     </div>
                                 </template>
-                                <svg-icon :iconName="'sigh-a'"
-                                          style="width: 16px; height: 16px;vertical-align: -0.2rem"></svg-icon>
-                            </el-tooltip>
+                                <template #reference>
+                                    <svg-icon :iconName="'sigh-a'"
+                                              style="width: 16px; height: 16px;vertical-align: -0.2rem"></svg-icon>
+                                </template>
+                            </el-popover>
                         </div>
                     </template>
                     <template #default="{ row, $index }">
@@ -328,7 +331,7 @@ watch(() => tableData, (newVal: any[]) => {
     font-size: 14px;
     line-height: 20px;
     padding: 5px 5px 5px 20px;
-    width: 200px;
+    width: 250px;
 }
 .table_box {
     .from_item {
