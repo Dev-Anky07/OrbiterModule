@@ -436,7 +436,6 @@ async function sendConsumer(value: any) {
   if (chainID == 8 || chainID == 88) {
     try {
       const imxHelper = new IMXHelper(chainID)
-      console.log(makerAddress, '==makerAddress')
       const imxClient = await imxHelper.getImmutableXClient(makerAddress)
 
       // Warnning: The nonce value of immutablex currently has no substantial effect
@@ -1209,14 +1208,14 @@ async function sendConsumer(value: any) {
       if (config.rpc.length <= 0) {
         throw new Error('Missing RPC configuration')
       }
-      const httpsProvider = new ethers.providers.JsonRpcProvider(config.rpc[0]);
+      const httpsProvider = new ethers.providers.JsonRpcProvider(web3Net);
       // let feeData = await httpsProvider.getFeeData();
       // if (feeData) {
       delete details['gasPrice'];
       delete details['gas'];
       let maxPriorityFeePerGas = 1000000000;
       try {
-        if (config.rpc.length > 0 && config.rpc[0].includes('alchemyapi')) {
+        if (config.rpc.length > 0 && web3Net.includes('alchemyapi')) {
           const alchemyMaxPriorityFeePerGas = await httpsProvider.send("eth_maxPriorityFeePerGas", []);
           if (Number(alchemyMaxPriorityFeePerGas) > maxPriorityFeePerGas) {
             maxPriorityFeePerGas = alchemyMaxPriorityFeePerGas;
@@ -1230,6 +1229,7 @@ async function sendConsumer(value: any) {
       details['maxFeePerGas'] = web3.utils.toHex(maxPrice * 10 ** 9);
       details['gasLimit'] = web3.utils.toHex(gasLimit);
       details['type'] = 2;
+
       const wallet = new ethers.Wallet(Buffer.from(makerConfig.privateKeys[makerAddress.toLowerCase()], 'hex'));
       const signedTx = await wallet.signTransaction(details);
       const resp = await httpsProvider.sendTransaction(signedTx);
@@ -1263,6 +1263,7 @@ async function sendConsumer(value: any) {
   } else {
     transaction = new EthereumTx(details, { chain: toChain })
   }
+
 
   /**
    * This is where the transaction is authorized on your behalf.
