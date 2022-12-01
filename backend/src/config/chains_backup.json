@@ -440,5 +440,33 @@
         "address": "0x2ceea9fead4584aba77ecde697e9fc80c9bd4c56"
       }
     ]
+  },
+  {
+    "api": {
+      "url": "https://api-nova.arbiscan.io/api",
+      "key": ""
+    },
+    "chainId": "42170",
+    "networkId": "42170",
+    "internalId": "16",
+    "name": "Arbitrum Nova",
+    "debug": false,
+    "contracts": [],
+    "nativeCurrency": {
+      "name": "ETH",
+      "symbol": "ETH",
+      "decimals": 18,
+      "address": "0x0000000000000000000000000000000000000000"
+    },
+    "rpc": ["https://nova.arbitrum.io/rpc"],
+    "watch": ["api", "rpc"],
+    "tokens": [
+      {
+        "name": "USD Coin",
+        "symbol": "USDC",
+        "decimals": 6,
+        "address": "0x750ba8b76187092b0d1e87e28daaf484d1b5273b"
+      }
+    ]
   }
 ]
