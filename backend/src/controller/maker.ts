@@ -7,12 +7,13 @@ import { makerConfig } from '../config'
 import { DydxHelper } from '../service/dydx/dydx_helper'
 import * as serviceMaker from '../service/maker'
 import * as serviceMakerWealth from '../service/maker_wealth'
-import { getMakerList } from '../util/maker'
+import { chains as Chains } from 'orbiter-chaincore/src/utils'
 
 // extend relativeTime
 dayjs.extend(relativeTime)
 export default function (router: KoaRouter<DefaultState, Context>) {
   router.get('maker', async ({ restful }) => {
+    const allChains = Chains.getAllChains()
     const chains = <{ chainId: number; chainName: string }[]>[]
     const pushChain = (chainId: number, chainName: string) => {
       const find = chains.find((item) => item.chainId == chainId)
@@ -22,10 +23,8 @@ export default function (router: KoaRouter<DefaultState, Context>) {
 
       chains.push({ chainId, chainName })
     }
-    const makerList = await getMakerList()
-    for (const item of makerList) {
-      pushChain(item.fromChain.id, item.fromChain.symbol)
-      pushChain(item.toChain.id, item.toChain.symbol)
+    for (const item of allChains) {
+      if(+item.internalId) pushChain(+item.internalId, item.name)
     }
 
     const earliestMakrNode = await serviceMaker.getEarliestMakerNode()
