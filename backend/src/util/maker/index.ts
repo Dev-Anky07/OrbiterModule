@@ -16,10 +16,10 @@ import { sleep } from '..'
 import { makerConfig } from '../../config'
 import { MakerNode } from '../../model/maker_node'
 import { MakerNodeTodo } from '../../model/maker_node_todo'
-import { MakerZkHash } from '../../model/maker_zk_hash'
 import zkspace_help from '../../service/zkspace/zkspace_help'
 import { Core } from '../core'
 import { accessLogger, errorLogger, getLoggerService } from '../logger'
+import { makerList, makerListHistory } from './maker_list'
 import send from './send'
 import { equals } from 'orbiter-chaincore/src/utils/core'
 import { chains } from 'orbiter-chaincore/src/utils'
@@ -28,12 +28,7 @@ import { IChainConfig } from 'orbiter-chaincore/src/types'
 const PrivateKeyProvider = require('truffle-privatekey-provider')
 import { doSms } from '../../sms/smsSchinese'
 import { getAmountToSend } from './core'
-import { MakerUtil } from './maker_util'
-import { IMarket } from './new_maker'
 
-const zkTokenInfo: any[] = []
-let zksTokenInfo: any[] = []
-let lpTokenInfo: any[] = []
 let accountInfo: AccountInfo
 let lpKey: string
 
@@ -43,16 +38,13 @@ const repositoryMakerNode = (): Repository<MakerNode> => {
 const repositoryMakerNodeTodo = (): Repository<MakerNodeTodo> => {
   return Core.db.getRepository(MakerNodeTodo)
 }
-const repositoryMakerZkHash = (): Repository<MakerZkHash> => {
-  return Core.db.getRepository(MakerZkHash)
-}
 
-export async function getMakerList(makerAddr?:string):Promise<Array<IMarket>> {
-  return MakerUtil.makerList;
+export async function getMakerList() {
+  return makerList
 }
 
 export async function getAllMakerList() {
-  return MakerUtil.makerList.concat(MakerUtil.makerListHistory)
+  return makerList.concat(makerListHistory)
 }
 
 export function expanPool(pool) {
@@ -127,9 +119,9 @@ async function checkLoopringAccountKey(makerAddress, fromChainID) {
           accountInfo.keySeed && accountInfo.keySeed !== ''
             ? accountInfo.keySeed
             : GlobalAPI.KEY_MESSAGE.replace(
-              '${exchangeAddress}',
-              exchangeInfo.exchangeAddress
-            ).replace('${nonce}', (accountInfo.nonce - 1).toString()),
+                '${exchangeAddress}',
+                exchangeInfo.exchangeAddress
+              ).replace('${nonce}', (accountInfo.nonce - 1).toString()),
         walletType: ConnectorNames.WalletLink,
         chainId: fromChainID == 99 ? ChainId.GOERLI : ChainId.MAINNET,
       }
@@ -175,10 +167,10 @@ function confirmToTransaction(
     }
     accessLogger.info(
       `[${transactionID}] Transaction with hash ` +
-      txHash +
-      ' has ' +
-      trxConfirmations.confirmations +
-      ' confirmation(s)'
+        txHash +
+        ' has ' +
+        trxConfirmations.confirmations +
+        ' confirmation(s)'
     )
 
     if (trxConfirmations.confirmations >= confirmations) {
@@ -204,8 +196,8 @@ function confirmToTransaction(
 
       accessLogger.info(
         `[${transactionID}] Transaction with hash ` +
-        txHash +
-        ' has been successfully confirmed'
+          txHash +
+          ' has been successfully confirmed'
       )
       return
     }
@@ -264,7 +256,6 @@ function confirmToZKTransaction(syncProvider, txID, transactionID) {
     if (!transferReceipt.success && transferReceipt.failReason) {
       return
     }
-
     return confirmToZKTransaction(syncProvider, txID, transactionID)
   }, 8 * 1000)
 }
@@ -301,8 +292,8 @@ function confirmToLPTransaction(
           accessLogger.info({ lpTransaction })
           accessLogger.info(
             'lp_Transaction with hash ' +
-            txID +
-            ' has been successfully confirmed'
+              txID +
+              ' has been successfully confirmed'
           )
           try {
             await repositoryMakerNode().update(
@@ -338,9 +329,11 @@ export async function confirmToSNTransaction(
 ) {
   try {
     accessLogger.info('confirmToSNTransaction =', getTime())
-    const provider = getProviderV4(Number(chainId) == 4 ? 'mainnet-alpha' : 'georli-alpha');
+    const provider = getProviderV4(
+      Number(chainId) == 4 ? 'mainnet-alpha' : 'georli-alpha'
+    )
     const response = await provider.getTransaction(txID)
-    const txStatus = response['status'];
+    const txStatus = response['status']
     accessLogger.info(
       'sn_transaction =',
       JSON.stringify({ status: txStatus, txID })
@@ -353,15 +346,15 @@ export async function confirmToSNTransaction(
         response['transaction_failure_reason']
       )
       // check nonce
-      if (
-        response['transaction_failure_reason'] &&
-        response['transaction_failure_reason']['error_message'].includes(
-          'Error message: nonce invalid'
-        )
-      ) {
-        return true
-      }
-      return false;
+      // if (
+      //   response['transaction_failure_reason'] &&
+      //   response['transaction_failure_reason']['error_message'].includes(
+      //     'Error message: nonce invalid'
+      //   )
+      // ) {
+      //   return true
+      // }
+      return false
       // return rollback(transaction['transaction_failure_reason'] && transaction['transaction_failure_reason']['error_message'], nonce);
     } else if (
       ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'].includes(txStatus)
@@ -389,7 +382,10 @@ export async function confirmToSNTransaction(
       rollback
     )
   } catch (error) {
-    getLoggerService(String(chainId)).error('confirmToSNTransaction error', error.message);
+    getLoggerService(String(chainId)).error(
+      'confirmToSNTransaction error',
+      error.message
+    )
   }
 }
 
@@ -448,6 +444,7 @@ function confirmToZKSTransaction(
       }
       return
     }
+
     // When failReason, don't try again
     if (
       !transferReceipt.success ||
@@ -456,7 +453,6 @@ function confirmToZKSTransaction(
     ) {
       return
     }
-
     return confirmToZKSTransaction(txID, transactionID, toChainId, makerAddress)
   }, 8 * 1000)
 }
@@ -490,18 +486,6 @@ async function getConfirmations(fromChain, txHash): Promise<any> {
   }
 }
 
-function getZKTokenInfo(tokenAddress) {
-  if (!zkTokenInfo.length) {
-    return null
-  } else {
-    for (let index = 0; index < zkTokenInfo.length; index++) {
-      const tokenInfo = zkTokenInfo[index]
-      if (tokenInfo.address === tokenAddress) {
-        return tokenInfo
-      }
-    }
-  }
-}
 function getTime() {
   const time = dayjs().format('YYYY-MM-DD HH:mm:ss')
   return time
@@ -537,6 +521,7 @@ export async function sendTransaction(
   result_nonce = 0,
   ownerAddress = ''
 ) {
+  const accessLogger = getLoggerService(toChainID);
   const amountToSend = getAmountToSend(
     fromChainID,
     toChainID,
@@ -606,6 +591,7 @@ export async function sendTransaction(
     ownerAddress
   )
     .then(async (response) => {
+      const accessLogger = getLoggerService(toChainID);
       accessLogger.info('response =', response)
       if (!response.code) {
         var txID = response.txid
@@ -711,7 +697,7 @@ export async function sendTransaction(
         }
         let alert = 'Send Transaction Error ' + transactionID
         try {
-          // doSms(alert)
+          doSms(alert)
         } catch (error) {
           errorLogger.error(
             `[${transactionID}] sendTransactionErrorMessage =`,
