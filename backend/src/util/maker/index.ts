@@ -28,6 +28,7 @@ import { IChainConfig } from 'orbiter-chaincore/src/types'
 const PrivateKeyProvider = require('truffle-privatekey-provider')
 import { doSms } from '../../sms/smsSchinese'
 import { getAmountToSend } from './core'
+import { MakerUtil } from './maker_util'
 
 let accountInfo: AccountInfo
 let lpKey: string
@@ -40,11 +41,11 @@ const repositoryMakerNodeTodo = (): Repository<MakerNodeTodo> => {
 }
 
 export async function getMakerList() {
-  return makerList
+  return MakerUtil.makerList;
 }
 
 export async function getAllMakerList() {
-  return makerList.concat(makerListHistory)
+  return MakerUtil.makerList.concat(MakerUtil.makerListHistory)
 }
 
 export function expanPool(pool) {
