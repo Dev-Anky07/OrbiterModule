@@ -10,8 +10,6 @@ import {
 } from '@loopring-web/loopring-sdk'
 import axios from 'axios'
 import BigNumber from 'bignumber.js'
-import Common from 'ethereumjs-common'
-import { Transaction as EthereumTx } from 'ethereumjs-tx'
 import * as ethers from 'ethers'
 import * as zksync2 from 'zksync-web3'
 import Web3 from 'web3'
@@ -42,7 +40,7 @@ const checkHealthAllChain = {
   smsInterval: 1000 * 60 * 5,
   lastSendSMSTime: 0
 };
-const getCurrentGasPrices = async (toChain: string, maxGwei = 165) => {
+const getCurrentGasPrices = async (toChain: string, maxGwei = 165, web3: any) => {
 
   if (toChain === 'mainnet' && !makerConfig[toChain].gasPrice) {
     try {
@@ -77,22 +75,10 @@ const getCurrentGasPrices = async (toChain: string, maxGwei = 165) => {
     }
   } else {
     try {
-      const response = await axios.post(makerConfig[toChain].httpEndPoint, {
-        jsonrpc: '2.0',
-        method: 'eth_gasPrice',
-        params: [],
-        id: 0,
-      })
-
-      if (response.status !== 200 || response.statusText !== 'OK') {
-        throw 'Eth_gasPrice response failed!'
-      }
-
-      let gasPrice = response.data.result
-
+      let gasPrice = await web3.eth.getGasPrice();
       // polygon gas price x2
       if (toChain == 'polygon' || toChain == 'polygon_test') {
-        if (parseInt(response.data.result, 16) < 100000000000) {
+        if (parseInt(gasPrice, 16) < 100000000000) {
           gasPrice = Web3.utils.toHex(200000000000)
         } else {
           gasPrice = Web3.utils.toHex(parseInt(gasPrice, 16) * 2)
@@ -925,13 +911,26 @@ async function sendConsumer(value: any) {
   if (makerConfig[toChain]) {
     web3Net = makerConfig[toChain].httpEndPointInfura || makerConfig[toChain].httpEndPoint
     accessLogger.info(`RPC from makerConfig ${toChain}`)
-  } else {
-    // 
-    accessLogger.info(`RPC from ChainCore ${toChain}`)
+  }
+  const chainConfig = chains.getChainInfo(Number(chainID));
+  if (isEmpty(chainConfig)) {
+    return {
+      code: -1,
+      errmsg: `Chain Config Not Found ${toChain}`
+    };
+  }
+  if (isEmpty(web3Net)) {
+    if (chainConfig && chainConfig.rpc && chainConfig.rpc.length > 0) {
+      web3Net = chainConfig.rpc[0];
+      accessLogger.info(`RPC from ChainCore ${toChain}`)
+    }
   }
   if (isEmpty(web3Net)) {
     accessLogger.error(`RPC not obtained ToChain ${toChain}`);
-    return;
+    return {
+      code: -1,
+      errmsg: `RPC not obtained ToChain ${toChain}`
+    };
   }
   const web3 = new Web3(web3Net)
   web3.eth.defaultAccount = makerAddress
@@ -1169,7 +1168,8 @@ async function sendConsumer(value: any) {
   const gasPrices = await getCurrentGasPrices(
     toChain,
     // isEthTokenAddress(tokenAddress) ? maxPrice : undefined
-    maxPrice
+    maxPrice,
+    web3
   )
   let gasLimit = 100000
   if (
@@ -1206,58 +1206,49 @@ async function sendConsumer(value: any) {
    * Build a new transaction object and sign it locally.
    */
 
-  const details: any = {
-    gas: web3.utils.toHex(gasLimit),
-    gasPrice: gasPrices, // converts the gwei price to wei
+  const details:any = {
+    gasLimit: web3.utils.toHex(gasLimit),
+    gasPrice: web3.utils.toHex(gasPrices), // converts the gwei price to wei
     nonce: result_nonce,
-    chainId: chainID, // mainnet: 1, rinkeby: 4
+    chainId: Number(chainConfig.chainId), // mainnet: 1, rinkeby: 4
+  }
+  const hexChainIds = [7,77];
+  if (hexChainIds.includes(Number(chainID))) {
+    details.chainId = web3.utils.toHex(details.chainId);
   }
   if (isEthTokenAddress(tokenAddress)) {
     details['to'] = toAddress
     details['value'] = web3.utils.toHex(amountToSend)
   } else {
     details['to'] = tokenAddress
-    details['value'] = '0x0'
+    details['value'] = '0x00'
     details['data'] = tokenContract.methods
       .transfer(toAddress, web3.utils.toHex(amountToSend))
       .encodeABI()
   }
+  const httpsProvider = new ethers.providers.JsonRpcProvider(web3Net);
   if ([1, 5].includes(chainID)) {
     try {
       // eip 1559 send
-      const config = chains.getChainByInternalId(chainID);
-      if (config && config.rpc.length <= 0) {
-        throw new Error('Missing RPC configuration')
-      }
-      const httpsProvider = new ethers.providers.JsonRpcProvider(web3Net);
-      // let feeData = await httpsProvider.getFeeData();
-      // if (feeData) {
       delete details['gasPrice'];
       delete details['gas'];
       let maxPriorityFeePerGas = 1000000000;
       try {
-        if (config && config.rpc.length > 0 && web3Net.includes('alchemyapi')) {
+        if (web3Net.includes('alchemy')) {
           const alchemyMaxPriorityFeePerGas = await httpsProvider.send("eth_maxPriorityFeePerGas", []);
           if (Number(alchemyMaxPriorityFeePerGas) > maxPriorityFeePerGas) {
             maxPriorityFeePerGas = alchemyMaxPriorityFeePerGas;
           }
+        } else {
+          // let feeData = await httpsProvider.getFeeData();
         }
       } catch (error) {
         accessLogger.error('eth_maxPriorityFeePerGas error', error.message);
       }
-
       details['maxPriorityFeePerGas'] = web3.utils.toHex(maxPriorityFeePerGas);
       details['maxFeePerGas'] = web3.utils.toHex(maxPrice * 10 ** 9);
       details['gasLimit'] = web3.utils.toHex(gasLimit);
       details['type'] = 2;
-      const wallet = new ethers.Wallet(Buffer.from(makerConfig.privateKeys[makerAddress.toLowerCase()], 'hex'));
-      const signedTx = await wallet.signTransaction(details);
-      const resp = await httpsProvider.sendTransaction(signedTx);
-      return {
-        code: 0,
-        txid: resp.hash
-      };
-      // }
     } catch (err) {
       nonceDic[makerAddress][chainID] = result_nonce - 1;
       return {
@@ -1267,67 +1258,14 @@ async function sendConsumer(value: any) {
       };
     }
   }
-  let transaction: EthereumTx
-  if (makerConfig[toChain]?.customChainId) {
-    const networkId = makerConfig[toChain]?.customChainId
-    const customCommon = Common.forCustomChain(
-      'mainnet',
-      {
-        name: toChain,
-        networkId,
-        chainId: networkId,
-      },
-      'petersburg'
-    )
-    transaction = new EthereumTx(details, { common: customCommon })
-  } else {
-    transaction = new EthereumTx(details, { chain: toChain })
-  }
-
-
-  /**
-   * This is where the transaction is authorized on your behalf.
-   * The private key is what unlocks your wallet.
-   */
-  transaction.sign(
-    Buffer.from(makerConfig.privateKeys[makerAddress.toLowerCase()], 'hex')
-  )
-  accessLogger.info('send transaction =', JSON.stringify(details));
-  /**
-   * Now, we'll compress the transaction info down into a transportable object.
-   */
-  const serializedTransaction = transaction.serialize()
-
-  /**
-   * Note that the Web3 library is able to automatically determine the "from" address based on your private key.
-   */
-  // const addr = transaction.from.toString('hex')
-  // log(`Based on your private key, your wallet address is ${addr}`)
-  /**
-   * We're ready! Submit the raw transaction details to the provider configured above.
-   */
-
-  return new Promise((resolve) => {
-    web3.eth
-      .sendSignedTransaction('0x' + serializedTransaction.toString('hex'))
-      .on('transactionHash', async (hash) => {
-        resolve({
-          code: 0,
-          txid: hash,
-        })
-      }).on("receipt", (tx: any) => {
-        accessLogger.info('send transaction receipt=', JSON.stringify(tx));
-      })
-      .on('error', (err: any) => {
-        nonceDic[makerAddress][chainID] = result_nonce - 1;
-        resolve({
-          code: 1,
-          txid: err,
-          error: err,
-          result_nonce,
-        })
-      })
-  })
+  accessLogger.info('send tx', details);
+  const wallet = new ethers.Wallet(Buffer.from(makerConfig.privateKeys[makerAddress.toLowerCase()], 'hex'));
+  const signedTx = await wallet.signTransaction(details);
+  const resp = await httpsProvider.sendTransaction(signedTx);
+  return {
+    code: 0,
+    txid: resp.hash
+  };
 }
 
 /**

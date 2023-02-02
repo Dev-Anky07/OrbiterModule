@@ -239,15 +239,13 @@ async function subscribeNewTransaction(newTxList: Array<ITransaction>) {
       )
       if (chainCoreUtil.isEmpty(fromTokenInfo) || !fromTokenInfo?.name) {
         accessLogger.error(
-          `[${transactionID}] Refund The query currency information does not exist: ` +
-          JSON.stringify(tx)
+          `[${transactionID}] Refund The query currency information does not exist: ${tx.hash}`
         )
         continue
       }
       if (maker.prohibitPaymentChain.split(',').includes(String(toChainInternalId))) {
         accessLogger.error(
-          `[${transactionID}] use new xvm transfer:` +
-          JSON.stringify(tx)
+          `[${transactionID}] use new xvm transfer:${tx.hash}`
         )
         continue
       }

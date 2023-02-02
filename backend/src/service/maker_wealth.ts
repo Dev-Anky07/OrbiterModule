@@ -142,63 +142,16 @@ async function getTokenBalance(
             : '0'
         break
 
-      case 1:
-      case 2:
-      case 22:
-      case 4:
-      case 44:
-      case 5:
-      case 7:
-      case 77:
-      case 10:
-      case 510:
-      case 12:
-      case 512:
-      case 14:
-      case 514:
-      case 15:
-      case 515:
-      case 16:
-      case 516:
-      case 17:
-      case 517:
-      case 518:
-      case 519:
-      case 520:
-        // const balanceService = 
-        // value = await balanceService.getBalance(makerAddress, tokenAddress);
+    default:
+        const chainConfig = chains.getChainInfo(Number(chainId));
+        if (!chainConfig) {
+          throw Error(`${chainId} chain config not found`);
+        }
         if (!balanceService[String(chainId)]) {
           balanceService[String(chainId)] = new ChainServiceTokenBalance(String(chainId));
         }
         const result = await balanceService[String(chainId)].getBalance(makerAddress, tokenAddress);
         return result && result.balance;
-        break
-      default:
-        const alchemyUrl = makerConfig[chainName]?.httpEndPoint || makerConfig[chainId]?.httpEndPoint
-        if (!alchemyUrl) {
-          break
-        }
-        // when empty tokenAddress or 0x00...000  get eth balances
-        if (!tokenAddress || isEthTokenAddress(tokenAddress) || chainId == 97) {
-          value = await createAlchemyWeb3(alchemyUrl).eth.getBalance(
-            makerAddress
-          )
-        } else {
-          const resp = await createAlchemyWeb3(
-            alchemyUrl
-          ).alchemy.getTokenBalances(makerAddress, [tokenAddress])
-
-          for (const item of resp.tokenBalances) {
-            if (item.error) {
-              continue
-            }
-
-            value = String(item.tokenBalance)
-
-            // Now only one
-            break
-          }
-        }
         break
     }
   } catch (error) {
@@ -209,29 +162,6 @@ async function getTokenBalance(
   }
 
   return value
-}
-
-/**
- * @param web3
- * @param makerAddress
- * @param tokenAddress
- * @returns
- */
-async function getBalanceByCommon(
-  web3: Web3,
-  makerAddress: string,
-  tokenAddress: string
-) {
-  const tokenContract = new web3.eth.Contract(
-    <any>makerConfig.ABI,
-    tokenAddress
-  )
-  const tokenBalanceWei = await tokenContract.methods
-    .balanceOf(makerAddress)
-    .call({
-      from: makerAddress,
-    })
-  return tokenBalanceWei
 }
 
 type WealthsChain = {

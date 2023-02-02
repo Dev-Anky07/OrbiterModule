@@ -151,18 +151,24 @@ function confirmToTransaction(
   Chain,
   txHash,
   transactionID,
-  confirmations = 3
+  confirmations = 3,
+  count= 0
 ) {
+  count++;
+  if (count>=100) {
+    return;
+  }
   accessLogger.info(`[${transactionID}] confirmToTransaction =`, getTime())
   setTimeout(async () => {
-    const trxConfirmations = await getConfirmations(Chain, txHash)
+    const trxConfirmations = await getConfirmations(Chain, txHash, ChainID)
     if (!trxConfirmations) {
       return confirmToTransaction(
         ChainID,
         Chain,
         txHash,
         transactionID,
-        confirmations
+        confirmations,
+        count
       )
     }
     accessLogger.info(
@@ -176,6 +182,10 @@ function confirmToTransaction(
     if (trxConfirmations.confirmations >= confirmations) {
       let info = <any>{}
       try {
+        const chainConfig = chains.getChainInfo(Number(ChainID));
+        if (!chainConfig) {
+          throw new Error('chainConfig not found');
+        }
         let toWeb3
         if (
           Chain === 'metis' ||
@@ -184,9 +194,9 @@ function confirmToTransaction(
           Chain === 'zksync2_test'
         ) {
           //no use alchemy provider
-          toWeb3 = new Web3(makerConfig[Chain].httpEndPoint)
+          toWeb3 = new Web3(chainConfig.rpc[0])
         } else {
-          toWeb3 = createAlchemyWeb3(makerConfig[Chain].httpEndPoint)
+          toWeb3 = createAlchemyWeb3(chainConfig.rpc[0])
         }
 
         info = await toWeb3.eth.getBlock(trxConfirmations.trx.blockNumber)
@@ -206,7 +216,8 @@ function confirmToTransaction(
       Chain,
       txHash,
       transactionID,
-      confirmations
+      confirmations,
+      count
     )
   }, 8 * 1000)
 }
@@ -457,8 +468,12 @@ function confirmToZKSTransaction(
   }, 8 * 1000)
 }
 
-async function getConfirmations(fromChain, txHash): Promise<any> {
+async function getConfirmations(fromChain, txHash, chainID): Promise<any> {
   accessLogger.info('getConfirmations =', getTime())
+  const chainConfig = chains.getChainInfo(Number(chainID));
+  if (!chainConfig) {
+    throw new Error('getConfirmations chain config not found')
+  }
   try {
     let web3
     if (
@@ -468,9 +483,9 @@ async function getConfirmations(fromChain, txHash): Promise<any> {
       fromChain === 'zksync2_test'
     ) {
       //no use alchemy provider
-      web3 = new Web3(makerConfig[fromChain].httpEndPoint)
+      web3 = new Web3(chainConfig.rpc[0])
     } else {
-      web3 = createAlchemyWeb3(makerConfig[fromChain].httpEndPoint)
+      web3 = createAlchemyWeb3(chainConfig.rpc[0])
     }
     const trx = await web3.eth.getTransaction(txHash)
     const currentBlock = await web3.eth.getBlockNumber()
