@@ -1328,7 +1328,7 @@ async function send(
       value,
       callback: (error, result) => {
         if (error) {
-          accessLogger.error(`sendQueue exec produce error:${error.message}`);
+          accessLogger.error(`sendQueue exec produce error:${error.message}`, error);
           reject(error)
         } else {
           resolve(result)

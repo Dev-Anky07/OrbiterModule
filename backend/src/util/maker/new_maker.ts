@@ -1,6 +1,7 @@
 import { ScanChainMain, pubSub, chains } from 'orbiter-chaincore';
 import { core as chainCoreUtil } from 'orbiter-chaincore/src/utils'
 import { getMakerList, sendTransaction } from '.'
+import {makerList} from './maker_list.ts';
 import * as orbiterCore from './core'
 import BigNumber from 'bignumber.js'
 import { TransactionIDV2 } from '../../service/maker'
@@ -404,12 +405,13 @@ export async function confirmTransactionSendMoneyBack(
 }
 
 export async function getNewMarketList(): Promise<Array<IMarket>> {
-  const makerList = await getMakerList()
-  return chainCoreUtil.flatten(
-    makerList.map((row) => {
-      return newExpanPool(row)
-    })
-  )
+  return makerList;
+  // const makerList = await getMakerList()
+  // return chainCoreUtil.flatten(
+  //   makerList.map((row) => {
+  //     return newExpanPool(row)
+  //   })
+  // )
 }
 export function groupWatchAddressByChain(makerList: Array<IMarket>): {
   [key: string]: Array<string>

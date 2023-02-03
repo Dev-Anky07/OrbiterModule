@@ -222,9 +222,9 @@ export async function getWealthsChains(makerAddress: string) {
       continue
     }
     // find token 
-    const chain1 = chains.getChainByInternalId(String(item.c1ID))
+    const chain1 = chains.getChainInfo(Number(item.c1ID))
     if (!chain1) {
-      throw new Error('chain config not found')
+      throw new Error(`${item.c1ID} chain config not found`)
     }
     const token1 = chains.getTokenByAddress(chain1.chainId, item.t1Address);
     pushToChainBalances(
@@ -233,9 +233,9 @@ export async function getWealthsChains(makerAddress: string) {
       token1?.symbol || "",
       token1?.decimals || item.precision
     )
-    const chain2 = chains.getChainByInternalId(String(item.c2ID))
+    const chain2 = chains.getChainInfo(Number(item.c2ID))
     if (!chain2) {
-      throw new Error('chain config not found')
+      throw new Error(`${item.c2ID} chain config not found`)
     }
     const token2 = chains.getTokenByAddress(chain2.chainId, item.t2Address);
     pushToChainBalances(
