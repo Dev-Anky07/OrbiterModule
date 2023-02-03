@@ -27,6 +27,7 @@ export class SendQueue {
       try {
         Object.keys(this.queues).forEach((chainId) => {
           const request = this.queues[chainId]
+          accessLogger.info('SendQueue checkHealth info', {chainId, count: request.datas.length, hashList: request.datas.map((row:any)=> row.transactionID)})
           if (request.datas.length > 0) {
             const lastMsg = request.datas[request.datas.length - 1]
             const lastMsgTimestamp = Number(lastMsg.timestamp || 0)

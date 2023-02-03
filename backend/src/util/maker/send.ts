@@ -131,6 +131,7 @@ sendQueue.checkHealth((timeout) => {
 
 async function sendConsumer(value: any) {
   let {
+    transactionID,
     makerAddress,
     toAddress,
     toChain,
@@ -144,7 +145,7 @@ async function sendConsumer(value: any) {
     ownerAddress,
   } = value
   const accessLogger = getLoggerService(chainID);
-  accessLogger.info(`sendConsumer [${process.pid}] =`, JSON.stringify(value));
+  accessLogger.info(`sendConsumer [${process.pid}] = ${transactionID}`, JSON.stringify(value));
   // zk || zk_test
   if (chainID === 3 || chainID === 33) {
     try {
@@ -1296,6 +1297,7 @@ async function sendConsumer(value: any) {
  * @returns
  */
 async function send(
+  transactionID:string,
   makerAddress: string,
   toAddress,
   toChain,
@@ -1311,6 +1313,7 @@ async function send(
   sendQueue.registerConsumer(chainID, sendConsumer)
   return new Promise((resolve, reject) => {
     const value = {
+      transactionID,
       makerAddress,
       toAddress,
       toChain,
