@@ -1,7 +1,6 @@
 import { ScanChainMain, pubSub, chains } from 'orbiter-chaincore';
 import { core as chainCoreUtil } from 'orbiter-chaincore/src/utils'
 import { getMakerList, sendTransaction } from '.'
-import {makerList} from './maker_list.ts';
 import * as orbiterCore from './core'
 import BigNumber from 'bignumber.js'
 import { TransactionIDV2 } from '../../service/maker'
@@ -145,9 +144,9 @@ async function subscribeNewTransaction(newTxList: Array<ITransaction>) {
     const txList: Array<ITransaction> = groupData[chainId]
     for (const tx of txList) {
       if (!(await isWatchAddress(tx.to))) {
-        // accessLogger.error(
-        //   `The receiving address is not a Maker address=${tx.to}, hash=${tx.hash}`
-        // )
+        errorLogger.error(
+          `The receiving address is not a Maker address=${tx.to}, hash=${tx.hash}`
+        )
         continue
       }
       const fromChain = await chains.getChainByChainId(tx.chainId)

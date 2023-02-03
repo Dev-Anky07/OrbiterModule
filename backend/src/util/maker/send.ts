@@ -1184,7 +1184,6 @@ async function sendConsumer(value: any) {
   ) {
     gasLimit = 1000000
   }
-  console.log(toChain, '==========toChain')
   if ([22,2].includes(chainID)) {
     try {
       if (isEthTokenAddress(tokenAddress)) {
@@ -1260,7 +1259,6 @@ async function sendConsumer(value: any) {
       };
     }
   }
-  accessLogger.info('send tx', details);
   const wallet = new ethers.Wallet(Buffer.from(makerConfig.privateKeys[makerAddress.toLowerCase()], 'hex'));
   details.from = wallet.address.toString();
   const signedTx = await wallet.signTransaction(details);
