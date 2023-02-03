@@ -404,13 +404,12 @@ export async function confirmTransactionSendMoneyBack(
 }
 
 export async function getNewMarketList(): Promise<Array<IMarket>> {
-  return makerList;
-  // const makerList = await getMakerList()
-  // return chainCoreUtil.flatten(
-  //   makerList.map((row) => {
-  //     return newExpanPool(row)
-  //   })
-  // )
+  const makerList = await getMakerList()
+  return chainCoreUtil.flatten(
+    makerList.map((row) => {
+      return newExpanPool(row)
+    })
+  )
 }
 export function groupWatchAddressByChain(makerList: Array<IMarket>): {
   [key: string]: Array<string>
