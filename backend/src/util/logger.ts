@@ -14,11 +14,11 @@ export function getLoggerService(key: string | number) {
     return {
         error(message: string, ...args: any) {
             accessLogger.error(message, ...args);
-            logger.error(`${message} - ${args.join(' ')}`);
+            logger.error(message, {args});
         },
         info(message: string, ...args: any) {
             accessLogger.info(message, ...args);
-            logger.info(`${message} - ${args.join(' ')}`);
+            logger.info(message, {args});
         }
     };
 }

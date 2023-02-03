@@ -107,7 +107,7 @@ async function checkLoopringAccountKey(makerAddress, fromChainID) {
     const provider = new PrivateKeyProvider(
       makerConfig.privateKeys[makerAddress.toLowerCase()],
       fromChainID == 9
-        ? makerConfig['mainnet'].httpEndPoint
+        ? makerConfig['1'].httpEndPoint
         : 'https://eth-goerli.alchemyapi.io/v2/fXI4wf4tOxNXZynELm9FIC_LXDuMGEfc'
     )
     try {
@@ -595,7 +595,7 @@ export async function sendTransaction(
       retryCount
     })
   )
-  await send(
+  send(
     makerAddress,
     toAddress,
     toChain,

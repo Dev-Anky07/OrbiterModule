@@ -1,7 +1,6 @@
 import ERC20 from './ERC20.json'
 import { utils } from 'ethers'
 import { Account, Contract, ec, Provider, uint256 } from 'starknet'
-import { sortBy } from 'lodash'
 import { Uint256 } from 'starknet/dist/utils/uint256'
 import BigNumber from 'bignumber.js'
 import { BigNumberish, toBN } from 'starknet/dist/utils/number'

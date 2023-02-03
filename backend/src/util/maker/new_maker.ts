@@ -166,7 +166,12 @@ async function subscribeNewTransaction(newTxList: Array<ITransaction>) {
         )
         continue
       }
-
+      if (tx.source === 'xvm' || tx.extra['xvm']) {
+        accessLogger.error(
+          `Ignore xvm transactions hash:${tx.hash}`
+        )
+        continue;
+      }
       const startTimeTimeStamp = LastPullTxMap.get(
         `${fromChain.internalId}:${tx.to.toLowerCase()}`
       )
@@ -245,7 +250,7 @@ async function subscribeNewTransaction(newTxList: Array<ITransaction>) {
       }
       if (maker.prohibitPaymentChain.split(',').includes(String(toChainInternalId))) {
         accessLogger.error(
-          `[${transactionID}] use new xvm transfer:${tx.hash}`
+          `[${transactionID}] use new maker client transfer:${tx.hash}`
         )
         continue
       }

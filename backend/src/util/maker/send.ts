@@ -40,14 +40,17 @@ const checkHealthAllChain = {
   smsInterval: 1000 * 60 * 5,
   lastSendSMSTime: 0
 };
-const getCurrentGasPrices = async (toChain: string, maxGwei = 165, web3: any) => {
-
-  if (toChain === 'mainnet' && !makerConfig[toChain].gasPrice) {
+const getCurrentGasPrices = async (chainID: number, maxGwei = 165, web3: any) => {
+  const chainConfig = chains.getChainInfo(chainID);
+  if (!chainConfig) {
+    throw new Error('getCurrentGasPrices chain config not found');
+  }
+  if (chainID == 1) {
     try {
-      const httpEndPoint = makerConfig[toChain].api.endPoint
-      const apiKey = makerConfig[toChain].gasKey
-        ? makerConfig[toChain].gasKey
-        : makerConfig[toChain].api.key
+      const httpEndPoint = makerConfig[chainID].api.endPoint
+      const apiKey = makerConfig[chainID].gasKey
+        ? makerConfig[chainID].gasKey
+        : makerConfig[chainID].api.key
       const url =
         httpEndPoint + '?module=gastracker&action=gasoracle&apikey=' + apiKey
       const response = await axios.get(url)
@@ -77,24 +80,26 @@ const getCurrentGasPrices = async (toChain: string, maxGwei = 165, web3: any) =>
     try {
       let gasPrice = await web3.eth.getGasPrice();
       // polygon gas price x2
-      if (toChain == 'polygon' || toChain == 'polygon_test') {
+      if ([6, 66].includes(chainID)) {
         if (parseInt(gasPrice, 16) < 100000000000) {
           gasPrice = Web3.utils.toHex(200000000000)
         } else {
           gasPrice = Web3.utils.toHex(parseInt(gasPrice, 16) * 2)
         }
       }
-      if (toChain == 'rinkeby') {
+      if (chainID == 5) {
         gasPrice = Web3.utils.toHex(20000000000)
         // gasPrice = Web3.utils.toHex(parseInt(gasPrice, 16) * 1.5)
       }
 
       return gasPrice
     } catch (error) {
-      getLoggerService(toChain).info(`gasPrice error ${error.message}`);
-      return Web3.utils.toHex(
-        Web3.utils.toWei(makerConfig[toChain].gasPrice + '', 'gwei')
-      )
+      getLoggerService(chainID).info(`gasPrice error ${error.message}`);
+      if (makerConfig[chainID] && makerConfig[chainID].gasPrice) {
+        return Web3.utils.toHex(
+          Web3.utils.toWei(makerConfig[chainID].gasPrice + '', 'gwei')
+        )
+      }
     }
   }
 }
@@ -274,12 +279,13 @@ async function sendConsumer(value: any) {
     try {
       let ethProvider
       let syncProvider
+      
       if (chainID === 514) {
-        const httpEndPoint = makerConfig['zksync2_test'].httpEndPoint
+        const httpEndPoint = makerConfig[chainID].httpEndPoint
         ethProvider = ethers.getDefaultProvider('goerli')
         syncProvider = new zksync2.Provider(httpEndPoint)
       } else {
-        const httpEndPoint = makerConfig['zksync2'].httpEndPoint //official httpEndpoint is not exists now
+        const httpEndPoint = makerConfig[chainID].httpEndPoint //official httpEndpoint is not exists now
         ethProvider = ethers.getDefaultProvider('homestead')
         syncProvider = new zksync2.Provider(httpEndPoint)
       }
@@ -506,7 +512,7 @@ async function sendConsumer(value: any) {
     const provider = new PrivateKeyProvider(
       makerConfig.privateKeys[makerAddress.toLowerCase()],
       chainID == 9
-        ? makerConfig['mainnet'].httpEndPoint
+        ? makerConfig[chainID].httpEndPoint
         : 'https://eth-goerli.alchemyapi.io/v2/fXI4wf4tOxNXZynELm9FIC_LXDuMGEfc'
     )
     try {
@@ -908,8 +914,8 @@ async function sendConsumer(value: any) {
     }
   }
   let web3Net = '';
-  if (makerConfig[toChain]) {
-    web3Net = makerConfig[toChain].httpEndPointInfura || makerConfig[toChain].httpEndPoint
+  if (makerConfig[chainID]) {
+    web3Net = makerConfig[chainID].httpEndPointInfura || makerConfig[chainID].httpEndPoint
     accessLogger.info(`RPC from makerConfig ${toChain}`)
   }
   const chainConfig = chains.getChainInfo(Number(chainID));
@@ -1166,21 +1172,19 @@ async function sendConsumer(value: any) {
     }
   }
   const gasPrices = await getCurrentGasPrices(
-    toChain,
+    chainID,
     // isEthTokenAddress(tokenAddress) ? maxPrice : undefined
     maxPrice,
     web3
   )
   let gasLimit = 100000
   if (
-    toChain === 'metis' ||
-    toChain === 'metis_test' ||
-    toChain === 'boba_test' ||
-    toChain === 'boba'
+    [10, 510, 14, 513].includes(chainID)
   ) {
     gasLimit = 1000000
   }
-  if (toChain === 'arbitrum_test' || toChain === 'arbitrum') {
+  console.log(toChain, '==========toChain')
+  if ([22,2].includes(chainID)) {
     try {
       if (isEthTokenAddress(tokenAddress)) {
         gasLimit = await web3.eth.estimateGas({
@@ -1197,6 +1201,7 @@ async function sendConsumer(value: any) {
       }
       gasLimit = Math.ceil(web3.utils.hexToNumber(gasLimit) * 1.5)
     } catch (error) {
+      accessLogger.error('arGasLimit error =', gasLimit)
       gasLimit = 1000000
     }
     accessLogger.info('arGasLimit =', gasLimit)
@@ -1206,15 +1211,11 @@ async function sendConsumer(value: any) {
    * Build a new transaction object and sign it locally.
    */
 
-  const details:any = {
+  const details: any = {
     gasLimit: web3.utils.toHex(gasLimit),
     gasPrice: web3.utils.toHex(gasPrices), // converts the gwei price to wei
     nonce: result_nonce,
     chainId: Number(chainConfig.chainId), // mainnet: 1, rinkeby: 4
-  }
-  const hexChainIds = [7,77];
-  if (hexChainIds.includes(Number(chainID))) {
-    details.chainId = web3.utils.toHex(details.chainId);
   }
   if (isEthTokenAddress(tokenAddress)) {
     details['to'] = toAddress
@@ -1260,12 +1261,23 @@ async function sendConsumer(value: any) {
   }
   accessLogger.info('send tx', details);
   const wallet = new ethers.Wallet(Buffer.from(makerConfig.privateKeys[makerAddress.toLowerCase()], 'hex'));
+  details.from = wallet.address.toString();
   const signedTx = await wallet.signTransaction(details);
-  const resp = await httpsProvider.sendTransaction(signedTx);
-  return {
-    code: 0,
-    txid: resp.hash
-  };
+  try {
+    const resp = await httpsProvider.sendTransaction(signedTx);
+    return {
+      code: 0,
+      txid: resp.hash
+    };
+  } catch (error) {
+    nonceDic[makerAddress][chainID] = result_nonce - 1
+    return {
+      code: 1,
+      txid: error,
+      result_nonce,
+    }
+  }
+
 }
 
 /**
