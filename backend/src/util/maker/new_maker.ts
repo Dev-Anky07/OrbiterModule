@@ -144,9 +144,9 @@ async function subscribeNewTransaction(newTxList: Array<ITransaction>) {
     const txList: Array<ITransaction> = groupData[chainId]
     for (const tx of txList) {
       if (!(await isWatchAddress(tx.to))) {
-        errorLogger.error(
-          `The receiving address is not a Maker address=${tx.to}, hash=${tx.hash}`
-        )
+        // errorLogger.error(
+        //   `The receiving address is not a Maker address=${tx.to}, hash=${tx.hash}`
+        // )
         continue
       }
       const fromChain = await chains.getChainByChainId(tx.chainId)

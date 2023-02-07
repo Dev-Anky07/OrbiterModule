@@ -803,7 +803,6 @@ async function sendConsumer(value: any) {
         ethers.utils.parseUnits(fee.toString(), 18)
       )
       //note:old was changed  here
-
       let sql_nonce = nonceDic[makerAddress]?.[chainID]
       if (!sql_nonce) {
         result_nonce = accountInfo.nonce
@@ -1201,7 +1200,7 @@ async function sendConsumer(value: any) {
       }
       gasLimit = Math.ceil(web3.utils.hexToNumber(gasLimit) * 1.5)
     } catch (error) {
-      accessLogger.error('arGasLimit error =', gasLimit)
+      accessLogger.error('arGasLimit error =', error)
       gasLimit = 1000000
     }
     accessLogger.info('arGasLimit =', gasLimit)
