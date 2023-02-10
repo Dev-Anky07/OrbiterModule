@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 import { BigNumber } from "bignumber.js";
-
+import {IMarket} from './new_maker'
 const MAX_BITS: any = {
   eth: 256,
   arbitrum: 256,
@@ -21,7 +21,14 @@ const MAX_BITS: any = {
   polygon_zkevm: 256,
   scroll_l1_test: 256,
   scroll_l2_test: 256,
+  orbiter: 256,
   taiko_a1_test: 256,
+};
+const precisionResolverMap: any = {
+  // pay attention:  the type of field "userAmount" in the following methods is not BigNumber
+  // but string in decimal!!!
+  "18": (userAmount: any) => userAmount.slice(0, 6),
+  default: (userAmount: any) => userAmount,
 };
 export const CHAIN_INDEX: any = {
   1: "eth",
@@ -54,10 +61,10 @@ export const CHAIN_INDEX: any = {
   16: "arbitrum_nova",
   516: "arbitrum_nova",
   517: "polygon_zkevm",
+  599: "orbiter",
   518: "scroll_l1_test",
   519: "scroll_l2_test",
   520: "taiko_a1_test",
-  599: "orbiter",
 };
 
 export const SIZE_OP = {
@@ -87,18 +94,38 @@ function isLPChain(chain: string | number) {
   return false;
 }
 
+/**
+ * @description {
+ *  This method is to confirm the legitimacy of the amount
+ *  if the amount u passed is legal, it will return it intact
+ *  otherwise the data we processed will be returned
+ * }
+ * @param userAmount the amount user given
+ * @param chain config of the current chain
+ */
+const performUserAmountLegality = (userAmount: BigNumber, chain: any) => {
+  const { precision } = chain;
+  const decimalData = userAmount.toFormat(); // convert BigNumber instance to decimal
+  // if the precision that current chain support equals 18, the maximum precision of userAmount u passed is 6
+  const matchResolver =
+    precisionResolverMap[precision] || precisionResolverMap["default"];
+  // eg: precision equals 18, but the value of userAmount is 0.3333333333
+  // covert result after matchResolver processed was 0.333333
+  const convertResult = matchResolver(decimalData, chain);
+  return new BigNumber(convertResult);
+};
 function getToAmountFromUserAmount(
   userAmount: any,
-  selectMakerInfo: any,
+  market: IMarket,
   isWei: any,
 ) {
   let toAmount_tradingFee = new BigNumber(userAmount).minus(
-    new BigNumber(selectMakerInfo.tradingFee),
+    new BigNumber(market.tradingFee),
   );
   let gasFee = toAmount_tradingFee
-    .multipliedBy(new BigNumber(selectMakerInfo.gasFee))
+    .multipliedBy(new BigNumber(market.gasFee))
     .dividedBy(new BigNumber(1000));
-  let digit = selectMakerInfo.precision === 18 ? 5 : 2;
+  let digit = market.fromChain.decimals === 18 ? 5 : 2;
   // accessLogger.info('digit =', digit)
   let gasFee_fix = gasFee.decimalPlaces(digit, BigNumber.ROUND_UP);
   // accessLogger.info('gasFee_fix =', gasFee_fix.toString())
@@ -109,7 +136,7 @@ function getToAmountFromUserAmount(
   }
   if (isWei) {
     return toAmount_fee.multipliedBy(
-      new BigNumber(10 ** selectMakerInfo.precision),
+      new BigNumber(10 ** market.fromChain.decimals),
     );
   } else {
     return toAmount_fee;
@@ -129,7 +156,7 @@ function getTAmountFromRAmount(
   if (Number(amount) < 1) {
     return {
       state: false,
-      error: `${Number(amount)} the token doesn't support that many decimal digits (getTAmountFromRAmount)`,
+      error: "the token doesn't support that many decimal digits",
     };
   }
   if (pText.length > SIZE_OP.P_NUMBER) {
@@ -140,7 +167,7 @@ function getTAmountFromRAmount(
   }
 
   const validDigit = AmountValidDigits(chain, amount); // 10 11
-  const amountLength = amount.length;
+  const amountLength = amount.toString().length;
   if (amountLength < SIZE_OP.P_NUMBER) {
     return {
       state: false,
@@ -181,7 +208,7 @@ function getPTextFromTAmount(chain: number, amount: string) {
   if (Number(amount) < 1) {
     return {
       state: false,
-      error: "the token doesn't support that many decimal digits (getPTextFromTAmount)",
+      error: "the token doesn't support that many decimal digits",
     };
   }
   amount = new BigNumber(String(amount)).toFixed();
@@ -223,10 +250,10 @@ function getRAmountFromTAmount(chain: number, amount: string) {
   if (Number(amount) < 1) {
     return {
       state: false,
-      error: "the token doesn't support that many decimal digits (getRAmountFromTAmount)",
+      error: "the token doesn't support that many decimal digits",
     };
   }
-  amount = new BigNumber(String(amount)).toFixed();
+
   const validDigit = AmountValidDigits(chain, amount); // 10 11
   const amountLength = amount.toString().length;
   if (amountLength < SIZE_OP.P_NUMBER) {
@@ -352,7 +379,7 @@ function pTextFormatZero(num: string) {
  * @param fromChainID
  * @param toChainID
  * @param amountStr
- * @param pool
+ * @param market
  * @param nonce
  * @returns
  */
@@ -360,7 +387,7 @@ export function getAmountToSend(
   fromChainID: number,
   toChainID: number,
   amountStr: string,
-  pool: { precision: number; tradingFee: number; gasFee: number },
+  market: IMarket,
   nonce: string | number,
 ) {
   const realAmount = getRAmountFromTAmount(fromChainID, amountStr);
@@ -368,19 +395,25 @@ export function getAmountToSend(
     console.error(realAmount.error);
     return;
   }
-  
-  const rAmount = <any>realAmount.rAmount;
+  let rAmount = <any>realAmount.rAmount;
   if (nonce > 8999) {
     console.error("nonce too high, not allowed");
     return;
   }
+  if (toChainID === 3) {
+    var prefix = rAmount.substr(0, 11);
+    rAmount = `${prefix}${"0".repeat(rAmount.length - prefix.length)}`;
+  }
   const nonceStr = pTextFormatZero(String(nonce));
   const readyAmount = getToAmountFromUserAmount(
-    new BigNumber(rAmount).dividedBy(new BigNumber(10 ** pool.precision)),
-    pool,
+    new BigNumber(rAmount).dividedBy(
+      new BigNumber(10 ** market.fromChain.decimals),
+    ),
+    market,
     true,
   );
-  return getTAmountFromRAmount(toChainID, readyAmount.toFixed(), nonceStr);
+
+  return getTAmountFromRAmount(toChainID, readyAmount.toString(), nonceStr);
 }
 /**
  * @param chainId

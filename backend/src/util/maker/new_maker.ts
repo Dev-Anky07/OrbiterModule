@@ -22,21 +22,31 @@ const repositoryMakerNode = (): Repository<MakerNode> => {
 }
 const LastPullTxMap: Map<String, Number> = new Map()
 export interface IMarket {
-  recipient: string
-  sender: string
+  id: string;
+  makerId: string;
+  ebcId: string;
+  recipient: string;
+  sender: string;
+  slippage: number;
+  tradingFee: number;
+  gasFee: number;
   fromChain: {
-    id: string
-    name: string
-    tokenAddress: string
-    symbol: string
-  }
+    id: number;
+    name: string;
+    tokenAddress: string;
+    symbol: string;
+    decimals: number;
+    maxPrice: number;
+    minPrice: number;
+  };
   toChain: {
-    id: string
-    name: string
-    tokenAddress: string
-    symbol: string
-  }
-  pool: any
+    id: number;
+    name: string;
+    tokenAddress: string;
+    symbol: string;
+    decimals: number;
+  };
+  times: Number[];
 }
 // checkData
 export function checkAmount(
@@ -58,12 +68,12 @@ export function checkAmount(
     return false
   }
   const rAmount = <any>realAmount.rAmount
-  const minPrice = new BigNumber(market.pool.minPrice)
-    .plus(new BigNumber(market.pool.tradingFee))
-    .multipliedBy(new BigNumber(10 ** market.pool.precision))
-  const maxPrice = new BigNumber(market.pool.maxPrice)
-    .plus(new BigNumber(market.pool.tradingFee))
-    .multipliedBy(new BigNumber(10 ** market.pool.precision))
+  const minPrice = new BigNumber(market.fromChain.minPrice)
+    .plus(new BigNumber(market.tradingFee))
+    .multipliedBy(new BigNumber(10 ** market.fromChain.decimals))
+  const maxPrice = new BigNumber(market.fromChain.maxPrice)
+    .plus(new BigNumber(market.tradingFee))
+    .multipliedBy(new BigNumber(10 ** market.fromChain.decimals))
   if (pText !== validPText) {
     accessLogger.error(
       `Payment checkAmount inconsistent: ${pText}!=${validPText}`
@@ -74,8 +84,8 @@ export function checkAmount(
     accessLogger.error(
       `Payment checkAmount Amount exceeds maximum limit: ${new BigNumber(
         rAmount
-      ).dividedBy(10 ** market.pool.precision)} > ${maxPrice.dividedBy(
-        10 ** market.pool.precision
+      ).dividedBy(10 ** market.fromChain.decimals)} > ${maxPrice.dividedBy(
+        10 ** market.fromChain.decimals
       )}`
     )
     return false
@@ -83,8 +93,8 @@ export function checkAmount(
     accessLogger.error(
       `Payment checkAmount The amount is below the minimum limit: ${new BigNumber(
         rAmount
-      ).dividedBy(10 ** market.pool.precision)} < ${minPrice.dividedBy(
-        10 ** market.pool.precision
+      ).dividedBy(10 ** market.fromChain.decimals)} < ${minPrice.dividedBy(
+        10 ** market.fromChain.decimals
       )}`
     )
     return false
@@ -403,13 +413,69 @@ export async function confirmTransactionSendMoneyBack(
     })
 }
 
+export function convertMakerConfig(chainList:any, makerConfigJSON:any): IMarket[] {
+  const makerMap: any = <any>makerConfigJSON;
+  const configs: IMarket[] = [];
+  for (const chainIdPair in makerMap) {
+    if (!makerMap.hasOwnProperty(chainIdPair)) continue;
+    const symbolPairMap = makerMap[chainIdPair];
+    const [fromChainId, toChainId] = chainIdPair.split("-");
+    const c1Chain = chainList.find(item => +item.internalId === +fromChainId);
+    const c2Chain = chainList.find(item => +item.internalId === +toChainId);
+    if (!c1Chain || !c2Chain) continue;
+    for (const symbolPair in symbolPairMap) {
+      if (!symbolPairMap.hasOwnProperty(symbolPair)) continue;
+      const makerData: any = symbolPairMap[symbolPair];
+      const [fromChainSymbol, toChainSymbol] = symbolPair.split("-");
+      const fromToken = [...c1Chain.tokens, c1Chain.nativeCurrency].find(
+        item => item.symbol === fromChainSymbol,
+      );
+      const toToken = [...c2Chain.tokens, c2Chain.nativeCurrency].find(
+        item => item.symbol === toChainSymbol,
+      );
+      if (!fromToken || !toToken) continue;
+      // handle makerConfigs
+      configs.push({
+        id: "",
+        makerId: "",
+        ebcId: "",
+        slippage: makerData.slippage || 0,
+        recipient: makerData.makerAddress,
+        sender: makerData.sender,
+        tradingFee: makerData.tradingFee,
+        gasFee: makerData.gasFee,
+        fromChain: {
+          id: +fromChainId,
+          name: c1Chain.name,
+          tokenAddress: fromToken.address,
+          symbol: fromChainSymbol,
+          decimals: fromToken.decimals,
+          minPrice: makerData.minPrice,
+          maxPrice: makerData.maxPrice,
+        },
+        toChain: {
+          id: +toChainId,
+          name: c2Chain.name,
+          tokenAddress: toToken.address,
+          symbol: toChainSymbol,
+          decimals: toToken.decimals,
+        },
+        times: [makerData.startTime, makerData.endTime],
+      });
+    }
+  }
+  return configs;
+}
+
 export async function getNewMarketList(): Promise<Array<IMarket>> {
-  const makerList = await getMakerList()
-  return chainCoreUtil.flatten(
-    makerList.map((row) => {
-      return newExpanPool(row)
-    })
-  )
+  // const makerList = await getMakerList()
+  // return chainCoreUtil.flatten(
+  //   makerList.map((row) => {
+  //     return newExpanPool(row)
+  //   })
+  // )
+  // TODO: 1
+  return convertMakerConfig()
 }
 export function groupWatchAddressByChain(makerList: Array<IMarket>): {
   [key: string]: Array<string>
@@ -434,100 +500,4 @@ export function groupWatchAddressByChain(makerList: Array<IMarket>): {
 // getNewMarketList().then((result) => {
 //   console.log(groupWatchAddressByChain(result), '===result')
 // })
-export function newExpanPool(pool): Array<IMarket> {
-  return [
-    {
-      recipient: pool.makerAddress,
-      sender: pool.makerAddress,
-      fromChain: {
-        id: String(pool.c1ID),
-        name: pool.c1Name,
-        tokenAddress: pool.t1Address,
-        symbol: pool.tName,
-      },
-      toChain: {
-        id: String(pool.c2ID),
-        name: pool.c2Name,
-        tokenAddress: pool.t2Address,
-        symbol: pool.tName,
-      },
-      // minPrice: pool.c1MinPrice,
-      // maxPrice: pool.c1MaxPrice,
-      // precision: pool.precision,
-      // avalibleDeposit: pool.c1AvalibleDeposit,
-      // tradingFee: pool.c1TradingFee,
-      // gasFee: pool.c1GasFee,
-      // avalibleTimes: pool.c1AvalibleTimes,
-      pool: {
-        //Subsequent versions will modify the structure
-        makerAddress: pool.makerAddress,
-        c1ID: pool.c1ID,
-        c2ID: pool.c2ID,
-        c1Name: pool.c1Name,
-        c2Name: pool.c2Name,
-        t1Address: pool.t1Address,
-        t2Address: pool.t2Address,
-        tName: pool.tName,
-        minPrice: pool.c1MinPrice,
-        maxPrice: pool.c1MaxPrice,
-        precision: pool.precision,
-        avalibleDeposit: pool.c1AvalibleDeposit,
-        tradingFee: pool.c1TradingFee,
-        gasFee: pool.c1GasFee,
-        avalibleTimes: pool.c1AvalibleTimes,
-      },
-    },
-    {
-      recipient: pool.makerAddress,
-      sender: pool.makerAddress,
-      fromChain: {
-        id: String(pool.c2ID),
-        name: pool.c2Name,
-        tokenAddress: pool.t2Address,
-        symbol: pool.tName,
-      },
-      toChain: {
-        id: String(pool.c1ID),
-        name: pool.c1Name,
-        tokenAddress: pool.t1Address,
-        symbol: pool.tName,
-      },
-      // minPrice: pool.c2MinPrice,
-      // maxPrice: pool.c2MaxPrice,
-      // precision: pool.precision,
-      // avalibleDeposit: pool.c2AvalibleDeposit,
-      // tradingFee: pool.c2TradingFee,
-      // gasFee: pool.c2GasFee,
-      // avalibleTimes: pool.c2AvalibleTimes,
-      pool: {
-        //Subsequent versions will modify the structure
-        makerAddress: pool.makerAddress,
-        c1ID: pool.c1ID,
-        c2ID: pool.c2ID,
-        c1Name: pool.c1Name,
-        c2Name: pool.c2Name,
-        t1Address: pool.t1Address,
-        t2Address: pool.t2Address,
-        tName: pool.tName,
-        minPrice: pool.c2MinPrice,
-        maxPrice: pool.c2MaxPrice,
-        precision: pool.precision,
-        avalibleDeposit: pool.c2AvalibleDeposit,
-        tradingFee: pool.c2TradingFee,
-        gasFee: pool.c2GasFee,
-        avalibleTimes: pool.c2AvalibleTimes,
-      },
-    },
-  ].map((row) => {
-    const L1L2Maping = makerConfig.starknetAddress;
-    if (['4', '44'].includes(row.toChain.id)) {
-      // starknet mapping
-      row.sender = L1L2Maping[row.sender.toLowerCase()]
-    }
-    if (['4', '44'].includes(row.fromChain.id)) {
-      // starknet mapping
-      row.recipient = L1L2Maping[row.recipient.toLowerCase()]
-    }
-    return row
-  })
-}
+

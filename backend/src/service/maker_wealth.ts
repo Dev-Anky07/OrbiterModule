@@ -108,39 +108,39 @@ async function getTokenBalance(
         const dydxHelper = new DydxHelper(chainId)
         value = (await dydxHelper.getBalanceUsdc(makerAddress)).toString()
         break
-      case 12:
-      case 512:
-        let balanceInfo = await ZKSpaceHelper.getZKSBalance({
-          account: makerAddress,
-          localChainID: chainId,
-        })
-        if (
-          !balanceInfo ||
-          !balanceInfo.length ||
-          balanceInfo.findIndex((item) => item.id == 0) == -1
-        ) {
-          value = '0'
-        }
-        let httpEndPoint = makerConfig.zkspace.httpEndPoint
-        if (chainId === 512) {
-          httpEndPoint = makerConfig.zkspace_test.httpEndPoint
-        }
-        let tokenInfos = await ZKSpaceHelper.getTokenInfos(httpEndPoint)
-        const zksTokenInfo = tokenInfos.find(
-          (item) =>
-            item.address.toLowerCase() ==
-            (tokenAddress ? tokenAddress.toLowerCase() : '0x' + '0'.repeat(40))
-        )
-        let defaultIndex = balanceInfo.findIndex(
-          (item) => item.id == (zksTokenInfo ? zksTokenInfo.id : 0)
-        )
-        value =
-          defaultIndex > -1
-            ? balanceInfo[defaultIndex].amount *
-            10 ** (zksTokenInfo ? zksTokenInfo.decimals : 18) +
-            ''
-            : '0'
-        break
+      // case 12:
+      // case 512:
+      //   let balanceInfo = await ZKSpaceHelper.getZKSBalance({
+      //     account: makerAddress,
+      //     localChainID: chainId,
+      //   })
+      //   if (
+      //     !balanceInfo ||
+      //     !balanceInfo.length ||
+      //     balanceInfo.findIndex((item) => item.id == 0) == -1
+      //   ) {
+      //     value = '0'
+      //   }
+      //   let httpEndPoint = makerConfig.zkspace.httpEndPoint
+      //   if (chainId === 512) {
+      //     httpEndPoint = makerConfig.zkspace_test.httpEndPoint
+      //   }
+      //   let tokenInfos = await ZKSpaceHelper.getTokenInfos(httpEndPoint)
+      //   const zksTokenInfo = tokenInfos.find(
+      //     (item) =>
+      //       item.address.toLowerCase() ==
+      //       (tokenAddress ? tokenAddress.toLowerCase() : '0x' + '0'.repeat(40))
+      //   )
+      //   let defaultIndex = balanceInfo.findIndex(
+      //     (item) => item.id == (zksTokenInfo ? zksTokenInfo.id : 0)
+      //   )
+      //   value =
+      //     defaultIndex > -1
+      //       ? balanceInfo[defaultIndex].amount *
+      //       10 ** (zksTokenInfo ? zksTokenInfo.decimals : 18) +
+      //       ''
+      //       : '0'
+      //   break
 
     default:
         const chainConfig = chains.getChainInfo(Number(chainId));
@@ -184,104 +184,104 @@ export async function getWealthsChains(makerAddress: string) {
     )
   }
 
-  const makerList = await getMakerList()
+  // const makerList = await getMakerList()
   const wealthsChains: WealthsChain[] = []
 
-  const pushToChainBalances = (
-    wChain: WealthsChain,
-    tokenAddress: string,
-    tokenName: string,
-    decimals: number
-  ) => {
-    const find = wChain.balances.find(
-      (item) => item.tokenAddress == tokenAddress
-    )
-    if (find) {
-      return
-    }
-    wChain.balances.push({ tokenAddress, tokenName, decimals, value: '' })
-  }
-  const pushToChains = (
-    makerAddress: string,
-    chainId: number,
-    chainName: string
-  ): WealthsChain => {
-    const find = wealthsChains.find((item) => item.chainId === chainId)
-    if (find) {
-      return find
-    }
+  // const pushToChainBalances = (
+  //   wChain: WealthsChain,
+  //   tokenAddress: string,
+  //   tokenName: string,
+  //   decimals: number
+  // ) => {
+  //   const find = wChain.balances.find(
+  //     (item) => item.tokenAddress == tokenAddress
+  //   )
+  //   if (find) {
+  //     return
+  //   }
+  //   wChain.balances.push({ tokenAddress, tokenName, decimals, value: '' })
+  // }
+  // const pushToChains = (
+  //   makerAddress: string,
+  //   chainId: number,
+  //   chainName: string
+  // ): WealthsChain => {
+  //   const find = wealthsChains.find((item) => item.chainId === chainId)
+  //   if (find) {
+  //     return find
+  //   }
 
-    // push chain where no exist
-    const item = { makerAddress, chainId, chainName, balances: [] }
-    wealthsChains.push(item)
+  //   // push chain where no exist
+  //   const item = { makerAddress, chainId, chainName, balances: [] }
+  //   wealthsChains.push(item)
 
-    return item
-  }
-  for (const item of makerList) {
-    if (item.makerAddress != makerAddress) {
-      continue
-    }
-    // find token 
-    const chain1 = chains.getChainInfo(Number(item.c1ID))
-    if (!chain1) {
-      throw new Error(`${item.c1ID} chain config not found`)
-    }
-    const token1 = chains.getTokenByAddress(chain1.chainId, item.t1Address);
-    pushToChainBalances(
-      pushToChains(item.makerAddress, item.c1ID, item.c1Name),
-      item.t1Address,
-      token1?.symbol || "",
-      token1?.decimals || item.precision
-    )
-    const chain2 = chains.getChainInfo(Number(item.c2ID))
-    if (!chain2) {
-      throw new Error(`${item.c2ID} chain config not found`)
-    }
-    const token2 = chains.getTokenByAddress(chain2.chainId, item.t2Address);
-    pushToChainBalances(
-      pushToChains(item.makerAddress, item.c2ID, item.c2Name),
-      item.t2Address,
-      token2?.symbol || "",
-      token2?.decimals || item.precision
-    )
-  }
-  // get tokan balance
-  for (const chain of wealthsChains) {
-    const chainId = chain['chainId']
-    if (chainId == 11 || chainId == 511) {
-      continue
-    }
-    const chainConfig = chains.getChainByInternalId(String(chainId))
-    if (chainConfig) {
-      const nativeCurrency = chainConfig.nativeCurrency
-      if (
-        nativeCurrency &&
-        chain.balances.findIndex(
-          (row) => equals(row.tokenAddress, nativeCurrency.address)
-        ) < 0
-      ) {
-        chain.balances.push({
-          tokenAddress: nativeCurrency.address,
-          tokenName: nativeCurrency.symbol,
-          decimals: nativeCurrency.decimals,
-          value: '',
-        })
-      }
-    }
-    if (utils.core.equals(chain.makerAddress, '0x80C67432656d59144cEFf962E8fAF8926599bCF8')) {
-      chain.balances.sort(item => {
-        return item.tokenName == 'ETH' ? -1 : 1;
-      })
-    } else if (utils.core.equals(chain.makerAddress, '0xd7Aa9ba6cAAC7b0436c91396f22ca5a7F31664fC')) {
-      chain.balances.sort(item => {
-        return item.tokenName == 'USDT' ? -1 : 1;
-      })
-    } else if (utils.core.equals(chain.makerAddress, '0x41d3D33156aE7c62c094AAe2995003aE63f587B3')) {
-      chain.balances.sort(item => {
-        return item.tokenName == 'USDC' ? -1 : 1;
-      })
-    }
-  }
+  //   return item
+  // }
+  // for (const item of makerList) {
+  //   if (item.makerAddress != makerAddress) {
+  //     continue
+  //   }
+  //   // find token 
+  //   const chain1 = chains.getChainInfo(Number(item.c1ID))
+  //   if (!chain1) {
+  //     throw new Error(`${item.c1ID} chain config not found`)
+  //   }
+  //   const token1 = chains.getTokenByAddress(chain1.chainId, item.t1Address);
+  //   pushToChainBalances(
+  //     pushToChains(item.makerAddress, item.c1ID, item.c1Name),
+  //     item.t1Address,
+  //     token1?.symbol || "",
+  //     token1?.decimals || item.precision
+  //   )
+  //   const chain2 = chains.getChainInfo(Number(item.c2ID))
+  //   if (!chain2) {
+  //     throw new Error(`${item.c2ID} chain config not found`)
+  //   }
+  //   const token2 = chains.getTokenByAddress(chain2.chainId, item.t2Address);
+  //   pushToChainBalances(
+  //     pushToChains(item.makerAddress, item.c2ID, item.c2Name),
+  //     item.t2Address,
+  //     token2?.symbol || "",
+  //     token2?.decimals || item.precision
+  //   )
+  // }
+  // // get tokan balance
+  // for (const chain of wealthsChains) {
+  //   const chainId = chain['chainId']
+  //   if (chainId == 11 || chainId == 511) {
+  //     continue
+  //   }
+  //   const chainConfig = chains.getChainByInternalId(String(chainId))
+  //   if (chainConfig) {
+  //     const nativeCurrency = chainConfig.nativeCurrency
+  //     if (
+  //       nativeCurrency &&
+  //       chain.balances.findIndex(
+  //         (row) => equals(row.tokenAddress, nativeCurrency.address)
+  //       ) < 0
+  //     ) {
+  //       chain.balances.push({
+  //         tokenAddress: nativeCurrency.address,
+  //         tokenName: nativeCurrency.symbol,
+  //         decimals: nativeCurrency.decimals,
+  //         value: '',
+  //       })
+  //     }
+  //   }
+  //   if (utils.core.equals(chain.makerAddress, '0x80C67432656d59144cEFf962E8fAF8926599bCF8')) {
+  //     chain.balances.sort(item => {
+  //       return item.tokenName == 'ETH' ? -1 : 1;
+  //     })
+  //   } else if (utils.core.equals(chain.makerAddress, '0xd7Aa9ba6cAAC7b0436c91396f22ca5a7F31664fC')) {
+  //     chain.balances.sort(item => {
+  //       return item.tokenName == 'USDT' ? -1 : 1;
+  //     })
+  //   } else if (utils.core.equals(chain.makerAddress, '0x41d3D33156aE7c62c094AAe2995003aE63f587B3')) {
+  //     chain.balances.sort(item => {
+  //       return item.tokenName == 'USDC' ? -1 : 1;
+  //     })
+  //   }
+  // }
   return wealthsChains
 }
 
