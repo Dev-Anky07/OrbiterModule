@@ -34,7 +34,7 @@ export const rabbitmq = new RabbitMQ(process.env["RABBIT_MQ"] || "");
 rabbitmq.connect().then((channel) => {
   const queueName = 'maker-transfer.q';
   channel.assertExchange(exchangeName, 'direct', { durable: true });
-  channel.assertQueue(queueName, {durable: true});
+  channel.assertQueue(queueName, { durable: true });
   channel.bindQueue(queueName, exchangeName, '');
 }).catch(err => {
   console.log('RabbitMQ conn fail', err);
@@ -130,9 +130,9 @@ async function checkLoopringAccountKey(makerAddress, fromChainID) {
           accountInfo.keySeed && accountInfo.keySeed !== ''
             ? accountInfo.keySeed
             : GlobalAPI.KEY_MESSAGE.replace(
-                '${exchangeAddress}',
-                exchangeInfo.exchangeAddress
-              ).replace('${nonce}', (accountInfo.nonce - 1).toString()),
+              '${exchangeAddress}',
+              exchangeInfo.exchangeAddress
+            ).replace('${nonce}', (accountInfo.nonce - 1).toString()),
         walletType: ConnectorNames.Unknown,
         chainId: fromChainID == 99 ? ChainId.GOERLI : ChainId.MAINNET,
       }
@@ -519,7 +519,7 @@ function getTime() {
  * @returns
  */
 export async function sendTransaction(
-  fromHash:string,
+  fromHash: string,
   makerAddress: string,
   transactionID,
   fromChainID,
@@ -609,18 +609,25 @@ export async function sendTransaction(
       const accessLogger = getLoggerService(toChainID);
       accessLogger.info('response =', response);
       let txID = response.txid
-      rabbitmq.publish(exchangeName, '', JSON.stringify({
-        fromHash,
-        transactionID,
-        makerAddress,
-        toAddress,
-        fromChainID,
-        toChainID,
-        tokenAddress,
-        toHash:txID || "",
-        toAmount: tAmount,
-        response
-      }));
+      try {
+        rabbitmq.publish(exchangeName, '', JSON.stringify({
+          fromHash,
+          transactionID,
+          makerAddress,
+          toAddress,
+          fromChainID,
+          toChainID,
+          tokenAddress,
+          toHash: txID || "",
+          toAmount: tAmount,
+          response
+        }));
+      } catch (error) {
+        errorLogger.error(
+          `push notify error transactionID = ${transactionID}`
+        )
+      }
+
       if (!response.code) {
         accessLogger.info(
           `update maker_node: state = 2, toTx = '${txID}', toAmount = ${tAmount} where transactionID=${transactionID}`
