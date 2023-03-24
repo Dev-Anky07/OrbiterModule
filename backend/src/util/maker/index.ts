@@ -28,6 +28,17 @@ import { IChainConfig } from 'orbiter-chaincore/src/types'
 const PrivateKeyProvider = require('truffle-privatekey-provider')
 import { doSms } from '../../sms/smsSchinese'
 import { getAmountToSend } from './core'
+import RabbitMQ from '../../util/rabbitmq';
+export const exchangeName = 'maker-transfer.v1';
+export const rabbitmq = new RabbitMQ(process.env["RABBIT_MQ"] || "");
+rabbitmq.connect().then((channel) => {
+  const queueName = 'maker-transfer.q';
+  channel.assertExchange(exchangeName, 'direct', { durable: true });
+  channel.assertQueue(queueName, {durable: true});
+  channel.bindQueue(queueName, exchangeName, '');
+}).catch(err => {
+  console.log('RabbitMQ conn fail', err);
+})
 
 let accountInfo: AccountInfo
 let lpKey: string
@@ -508,6 +519,7 @@ function getTime() {
  * @returns
  */
 export async function sendTransaction(
+  fromHash:string,
   makerAddress: string,
   transactionID,
   fromChainID,
@@ -580,6 +592,7 @@ export async function sendTransaction(
     })
   )
   await send(
+    fromHash,
     makerAddress,
     toAddress,
     toChain,
@@ -595,8 +608,20 @@ export async function sendTransaction(
     .then(async (response) => {
       const accessLogger = getLoggerService(toChainID);
       accessLogger.info('response =', response);
+      let txID = response.txid
+      rabbitmq.publish(exchangeName, '', JSON.stringify({
+        fromHash,
+        transactionID,
+        makerAddress,
+        toAddress,
+        fromChainID,
+        toChainID,
+        tokenAddress,
+        toHash:txID || "",
+        toAmount: tAmount,
+        response
+      }));
       if (!response.code) {
-        var txID = response.txid
         accessLogger.info(
           `update maker_node: state = 2, toTx = '${txID}', toAmount = ${tAmount} where transactionID=${transactionID}`
         )

@@ -20,6 +20,7 @@ const allChainsConfig = [...mainnetChains, ...testnetChains]
 const repositoryMakerNode = (): Repository<MakerNode> => {
   return Core.db.getRepository(MakerNode)
 }
+
 const LastPullTxMap: Map<String, Number> = new Map()
 export interface IMarket {
   recipient: string
@@ -179,7 +180,7 @@ async function subscribeNewTransaction(newTxList: Array<ITransaction>) {
           `The transaction time is less than the program start time: chainId=${tx.chainId},hash=${tx.hash}`
         )
         // TAG:  rinkeby close
-        continue
+        // continue
       }
       let ext = '';
       if ([8, 88].includes(Number(fromChain.internalId))) {
@@ -395,6 +396,7 @@ export async function confirmTransactionSendMoneyBack(
       }
 
       await sendTransaction(
+        tx.hash,
         makerAddress,
         transactionID,
         fromChainID,
@@ -406,7 +408,7 @@ export async function confirmTransactionSendMoneyBack(
         market.pool,
         tx.nonce,
         0,
-        tx.from
+        tx.from,
       )
     })
     .catch((error) => {

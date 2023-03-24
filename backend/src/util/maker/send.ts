@@ -1241,6 +1241,7 @@ async function sendConsumer(value: any) {
  * @returns
  */
 async function send(
+  fromHash:string,
   makerAddress: string,
   toAddress,
   toChain,
@@ -1256,6 +1257,7 @@ async function send(
   sendQueue.registerConsumer(chainID, sendConsumer)
   return new Promise((resolve, reject) => {
     const value = {
+      fromHash,
       makerAddress,
       toAddress,
       toChain,
