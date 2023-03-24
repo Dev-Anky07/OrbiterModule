@@ -46,8 +46,8 @@ export class TransactionController {
   @ApiOperation({ summary: 'Get makers' })
   @ApiResponse({ status: 200, description: 'Return bad transactions.'})
   @Get('makers')
-  async getMakers () {
-    const list = await this.transactionService.getMakers()
-    return { list };
+  async getMakers() {
+    const list = await this.transactionService.getMakers();
+    return { list, code: 0 };
   }
 }
