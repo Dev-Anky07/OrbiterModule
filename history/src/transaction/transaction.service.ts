@@ -266,4 +266,11 @@ export class TransactionService {
     // console.log('feeSymbolTotal:', feeSymbolTotal.toString());
     return fromSymbolTotal.minus(toSymbolTotal).minus(feeSymbolTotal);
   }
+
+  public async getMakers() {
+    const sql = `SELECT DISTINCT(replySender) from transaction where \`status\` != 99 and replySender != ''`
+    const list = await this.manager.query(sql)
+    console.log(list)
+    return list.map(item => item.replySender)
+  }
 }
