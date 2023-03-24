@@ -608,7 +608,6 @@ export async function sendTransaction(
     .then(async (response) => {
       const accessLogger = getLoggerService(toChainID);
       accessLogger.info('response =', response);
-      let txID = response.txid
       try {
         rabbitmq.publish(exchangeName, '', JSON.stringify({
           fromHash,
@@ -618,7 +617,6 @@ export async function sendTransaction(
           fromChainID,
           toChainID,
           tokenAddress,
-          toHash: txID || "",
           toAmount: tAmount,
           response
         }));
@@ -629,6 +627,7 @@ export async function sendTransaction(
       }
 
       if (!response.code) {
+        let txID = response.txid
         accessLogger.info(
           `update maker_node: state = 2, toTx = '${txID}', toAmount = ${tAmount} where transactionID=${transactionID}`
         )
