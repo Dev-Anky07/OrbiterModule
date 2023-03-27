@@ -2,7 +2,8 @@ import { $env } from '@/env'
 import { $axios } from '@/plugins/axios'
 import { reactive, ref } from 'vue'
 import http from '@/plugins/axios2'
-
+import { ethers } from 'ethers';
+import chains from '../chain';
 const chainNameToId = {
   ethereum: 1,
   arbitrum: 2,
@@ -81,6 +82,20 @@ function transforeDate(params: any = {}) {
     }
   }
 }
+function getDecimals(chainId, symbol) {
+  if (symbol) {
+    return 18
+  }
+  const chain = chains.find((e) => Number(e.internalId) === chainId)
+  if (!chain) {
+    return 18
+  }
+  const token = chain.tokens.find((e) => e.name === symbol)
+  if (!token) {
+    return 18
+  }
+  return token?.decimals
+}
 function transforeData(list: any = []) {
   const accountExploreUrl = $env.accountExploreUrl
 
@@ -103,7 +118,15 @@ function transforeData(list: any = []) {
       item.toTxHref = $env.txExploreUrl[item.toChain] + item.matchedTx.tx_hash
       item.toTimeStamp = item.matchedTx.timestamp
     }
-
+    
+    if (item.inData) {
+      let toSymbol = item.inData.extra?.toSymbol
+      if (!toSymbol) {
+        toSymbol = item.inData.symbol
+      }
+      item.formatFromAmount = ethers.utils.formatUnits(item.inData.value, getDecimals(item.fromChain, item.inData.symbol));
+      item.formatToAmount = ethers.utils.formatUnits(item.toAmount, getDecimals(item.toChain, toSymbol));
+    }
     // item.fromAmountFormat = +item.fromValue / Math.pow(10, 18)
     // item.toAmountFormat = +item.toValue / Math.pow(10, 18)
 

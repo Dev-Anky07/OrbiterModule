@@ -100,7 +100,7 @@
           </el-col>
         </el-row>
         <el-row :gutter="20">
-          <el-col :span="16">
+          <el-col :span="5">
             <div class="title">state</div>
             <el-select v-model="state.status" placeholder="Select">
               <el-option
@@ -110,6 +110,24 @@
                 :value="item.value"
               ></el-option>
             </el-select>
+          </el-col>
+          <el-col :span="5">
+            <div class="title">minAmount</div>
+            <el-input
+              style="width: 200px;"
+              v-model="state.minAmount"
+              placeholder="Input minAmount"
+              :clearable="true"
+            />
+          </el-col>
+          <el-col :span="5">
+            <div class="title">maxAmount</div>
+            <el-input
+              style="width: 200px;"
+              v-model="state.maxAmount"
+              placeholder="Input maxAmount"
+              :clearable="true"
+            />
           </el-col>
           <el-col :span="4" class="maker-search__item">
             <div class="title">Reset | Apply</div>
@@ -317,6 +335,22 @@
                 </TextLong>
               </template>
             </el-table-column>
+            <el-table-column width="120">
+              <template #header>
+                FromAmount
+                <br />ToAmount
+              </template>
+              <template #default="{ row }">
+                <TextLong :content="row?.formatFromAmount">
+                  <span class="amount-operator--plus">+</span>
+                  {{ row?.formatFromAmount }}
+                </TextLong>
+                <TextLong :content="row.formatToAmount" placement="bottom">
+                  <span class="amount-operator--minus">-</span>
+                  {{ row.formatToAmount }}
+                </TextLong>
+              </template>
+            </el-table-column>
             <el-table-column prop="state" label="State" width="120">
               <template #default="{ row }">
                 <el-tag
@@ -470,7 +504,6 @@ import { ref, computed, inject, reactive, watch, toRef } from 'vue'
 import Web3 from 'web3'
 import { getTotals, makerInfo } from '../hooks/maker'
 import { $env } from '../env'
-
 const stateTags = {
   1: { label: '成功', type: 'success' },
   2: { label: '人工确认成功', type: 'success' },
@@ -513,6 +546,8 @@ const state = reactive({
   userAddressSelected: '',
   keyword: '',
   status: -1,
+  minAmount: '',
+  maxAmount: '',
 })
 const shortcuts = [
   {
@@ -650,6 +685,8 @@ const getMakerNodes = async (more: any = {}) => {
     rangeDate: state.rangeDate,
     keyword: state.keyword.trim(),
     state: state.status,
+    minAmount: state.minAmount,
+    maxAmount: state.maxAmount,
     ...prevMore,
   })
   loadingNodes.value = false
