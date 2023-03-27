@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-header>
+    <!-- <el-header>
       <div class="el-header__container">
         <div class="header-logo">
           <img src="./assets/logo.png" alt="logo" />
@@ -13,7 +13,6 @@
           :router="true"
         >
           <template v-for="(item, index) in navs" :key="index">
-            <!-- If route.meta.navHide is undefined or navHide == false, display -->
             <el-menu-item v-if="!item.meta.navHide" :index="item.path">
               {{ item.name }}
             </el-menu-item>
@@ -39,7 +38,7 @@
           </el-dropdown>
         </div>
       </div>
-    </el-header>
+    </el-header> -->
     <el-container>
       <!-- <el-aside>
       </el-aside> -->
@@ -54,14 +53,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ArrowDown } from '@element-plus/icons'
 import { provide, reactive, toRef } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { $axios } from './plugins/axios'
+// import { useRoute } from 'vue-router'
+// import { $axios } from './plugins/axios'
 
-const route = useRoute()
-const router = useRouter()
-const navs = router.getRoutes()
+// const route = useRoute()
+// const router = useRouter()
 
 const state = reactive({
   makerAddresses: [] as string[],
@@ -69,31 +66,31 @@ const state = reactive({
   exchangeRates: {} as { [key: string]: string },
 })
 const makerAddressSelected = toRef(state, 'makerAddressSelected')
-const makerAddresses = toRef(state, 'makerAddresses')
+// const makerAddresses = toRef(state, 'makerAddresses')
 const exchangeRates = toRef(state, 'exchangeRates')
 
 provide('makerAddressSelected', makerAddressSelected)
 provide('exchangeRates', exchangeRates)
 
-const getGlobalInfo = async () => {
-  const resp = await $axios.get('global')
-  state.makerAddresses = resp.data.makerAddresses
-  state.exchangeRates = resp.data.exchangeRates
+// const getGlobalInfo = async () => {
+//   const resp = await $axios.get('global')
+//   state.makerAddresses = resp.data.makerAddresses
+//   state.exchangeRates = resp.data.exchangeRates
 
-  state.makerAddressSelected = state.makerAddresses?.[0] || ''
+//   state.makerAddressSelected = state.makerAddresses?.[0] || ''
 
-  // Set makerAddressSelected from route.query.makerAddress
-  setTimeout(() => {
-    const makerAddress = String(route.query.makerAddress)
-    if (state.makerAddresses.indexOf(makerAddress) > -1) {
-      state.makerAddressSelected = makerAddress
-    }
-  }, 1)
-}
-const onClickMakerAddressItem = (makerAddress: string) => {
-  state.makerAddressSelected = makerAddress
-}
-getGlobalInfo()
+//   // Set makerAddressSelected from route.query.makerAddress
+//   setTimeout(() => {
+//     const makerAddress = String(route.query.makerAddress)
+//     if (state.makerAddresses.indexOf(makerAddress) > -1) {
+//       state.makerAddressSelected = makerAddress
+//     }
+//   }, 1)
+// }
+// const onClickMakerAddressItem = (makerAddress: string) => {
+//   state.makerAddressSelected = makerAddress
+// }
+// getGlobalInfo()
 </script>
 
 <style lang="scss" scoped>
@@ -201,8 +198,7 @@ $max-width: 1600px;
 
 .el-main {
   margin-top: $header-height;
-  // margin-left: $aside-width; // hide aside
-  margin: $header-height auto 0 auto;
+  margin: 0 auto 0 auto;
   max-width: $max-width;
 }
 </style>

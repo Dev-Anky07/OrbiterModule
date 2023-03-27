@@ -1,6 +1,10 @@
 <template>
-  <div class="maker">
-    <div
+  <div>
+    <div class="maker">
+      <div class="head">
+        <Login />
+      </div>
+      <!-- <div
       class="maker-block maker-header maker-header--balances"
       v-loading="loadingWealths"
       element-loading-text="Loading Balances"
@@ -44,126 +48,106 @@
         </el-col>
       </el-row>
       <el-empty v-else description="Empty balances"></el-empty>
-    </div>
-    <div
-      class="maker-block maker-header maker-header--search"
-      v-loading="loadingNodes"
-    >
-      <el-row :gutter="20">
-        <el-col :span="4" class="maker-search__item">
-          <div class="title">From chain</div>
-          <el-select v-model="state.fromChainId" placeholder="Select">
-            <el-option
-              v-for="(item, index) in chains"
-              :key="index"
-              :label="mappingChainName(item.chainName)"
-              :value="item.chainId"
-            ></el-option>
-          </el-select>
-        </el-col>
-        <el-col :span="4" class="maker-search__item">
-          <div class="title">To chain</div>
-          <el-select v-model="state.toChainId" placeholder="Select">
-            <el-option
-              v-for="(item, index) in chains"
-              :key="index"
-              :label="mappingChainName(item.chainName)"
-              :value="item.chainId"
-            ></el-option>
-          </el-select>
-        </el-col>
-        <el-col v-if="!state.keyword" :span="8" class="maker-search__item">
-          <div class="title">From date range</div>
-          <el-date-picker
-            v-model="state.rangeDate"
-            type="datetimerange"
-            range-separator="To"
-            :shortcuts="shortcuts"
-            start-placeholder="Start date"
-            end-placeholder="End date"
-            :clearable="false"
-            :offset="-110"
-            :show-arrow="false"
-          ></el-date-picker>
-        </el-col>
-        <el-col :span="8" class="maker-search__item">
-          <div class="title">TransactionID | User | FromTx | ToTx</div>
-          <el-input
-            v-model="state.keyword"
-            placeholder="Input search keyword."
-            :clearable="true"
-          />
-        </el-col>
-      </el-row>
-      <el-row :gutter="20">
-        <el-col :span="16">
-          <div class="title">state</div>
-          <el-select v-model="state.status" placeholder="Select">
-            <el-option
-              v-for="(item, index) in status"
-              :key="index"
-              :label="item.label"
-              :value="item.value"
-            ></el-option>
-          </el-select>
-        </el-col>
-        <el-col :span="4" class="maker-search__item">
-          <div class="title">Reset | Apply</div>
-          <el-button @click="reset">Reset</el-button>
-          <el-button type="primary" @click="() => clickApply()"
-            >Apply</el-button
-          >
-        </el-col>
-      </el-row>
-      <el-row v-if="state.userAddressSelected">
-        <el-tag closable @close="state.userAddressSelected = ''">
-          UserAddress: {{ state.userAddressSelected }}
-        </el-tag>
-      </el-row>
-    </div>
-    <div
-      class="maker-block maker-header maker-header__statistics"
-      v-loading="loadingStatistics"
-    >
-      <el-button-group v-if="false">
-        <el-button
-          :disabled="loadingNodes"
-          size="small"
-          @click="onClickPageButton(false)"
-        >
-          Previous Page
-        </el-button>
-        <el-button
-          :disabled="loadingNodes"
-          size="small"
-          @click="onClickPageButton(true)"
-        >
-          Next Page
-        </el-button>
-      </el-button-group>
-      <div>TransactionTotal: {{ statistics.total }}</div>
-      <div>
-        <el-popover placement="bottom" width="max-content" trigger="hover">
-          <template #default>
-            <div class="user-addresses">
-              <div
-                v-for="(item, index) in userAddressList"
+    </div> -->
+      <div
+        class="maker-block maker-header maker-header--search"
+        v-loading="loadingNodes"
+      >
+        <el-row :gutter="20">
+          <el-col :span="4" class="maker-search__item">
+            <div class="title">From chain</div>
+            <el-select v-model="state.fromChainId" placeholder="Select">
+              <el-option
+                v-for="(item, index) in chains"
                 :key="index"
-                @click="state.userAddressSelected = item.address"
-              >
-                {{ item.address }}
-                <span>&nbsp;({{ item.count }})</span>
-              </div>
-            </div>
-          </template>
-          <template #reference>
-            <span>UserAddressTotal:{{ userAddressList.length }}</span>
-          </template>
-        </el-popover>
+                :label="mappingChainName(item.chainName)"
+                :value="item.chainId"
+              ></el-option>
+            </el-select>
+          </el-col>
+          <el-col :span="4" class="maker-search__item">
+            <div class="title">To chain</div>
+            <el-select v-model="state.toChainId" placeholder="Select">
+              <el-option
+                v-for="(item, index) in chains"
+                :key="index"
+                :label="mappingChainName(item.chainName)"
+                :value="item.chainId"
+              ></el-option>
+            </el-select>
+          </el-col>
+          <el-col v-if="!state.keyword" :span="8" class="maker-search__item">
+            <div class="title">From date range</div>
+            <el-date-picker
+              v-model="state.rangeDate"
+              type="datetimerange"
+              range-separator="To"
+              :shortcuts="shortcuts"
+              start-placeholder="Start date"
+              end-placeholder="End date"
+              :clearable="false"
+              :offset="-110"
+              :show-arrow="false"
+            ></el-date-picker>
+          </el-col>
+          <el-col :span="8" class="maker-search__item">
+            <div class="title">TransactionID</div>
+            <el-input
+              v-model="state.keyword"
+              placeholder="Input search keyword."
+              :clearable="true"
+            />
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="16">
+            <div class="title">state</div>
+            <el-select v-model="state.status" placeholder="Select">
+              <el-option
+                v-for="(item, index) in status"
+                :key="index"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-col>
+          <el-col :span="4" class="maker-search__item">
+            <div class="title">Reset | Apply</div>
+            <el-button @click="reset">Reset</el-button>
+            <el-button type="primary" @click="() => clickApply()"
+              >Apply</el-button
+            >
+          </el-col>
+        </el-row>
+        <el-row v-if="state.userAddressSelected">
+          <el-tag closable @close="state.userAddressSelected = ''">
+            UserAddress: {{ state.userAddressSelected }}
+          </el-tag>
+        </el-row>
       </div>
-      <div>FromAmountTotal: {{ statistics.fromAmount }}</div>
-      <div>ToAmountTotal: {{ statistics.toAmount }}</div>
-      <div style="color: #67c23a; font-weight: 600">
+      <div class="maker-block maker-header maker-header__statistics">
+        <el-button-group v-if="false">
+          <el-button
+            :disabled="loadingNodes"
+            size="small"
+            @click="onClickPageButton(false)"
+          >
+            Previous Page
+          </el-button>
+          <el-button
+            :disabled="loadingNodes"
+            size="small"
+            @click="onClickPageButton(true)"
+          >
+            Next Page
+          </el-button>
+        </el-button-group>
+        <div>成功: {{ statistics.successByMatchedCount }}</div>
+        <div>人工确认成功: {{ statistics.successByAdminCount }}</div>
+        <div>人工确认无回款: {{ statistics.failByAdminCount }}</div>
+        <div>多条tx匹配: {{ statistics.failByMultiCount }}</div>
+        <div>失败: {{ statistics.failByUnknownCount }}</div>
+        <!-- <div style="color: #67c23a; font-weight: 600">
         +{{ statistics.profit['USD'] }} USD
       </div>
       <el-dropdown>
@@ -182,213 +166,296 @@
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
-      </el-dropdown>
+      </el-dropdown> -->
 
-      <div style="color: #f56c6c; font-weight: 600">
+        <!-- <div style="color: #f56c6c; font-weight: 600">
         +{{ statistics.profit['CNY'] }} CNY
-      </div>
-      <div style="margin-left: auto">
+      </div> -->
+        <!-- <div style="margin-left: auto">
         <router-link
           :to="`/maker/history?makerAddress=${makerAddressSelected}`"
           target="_blank"
         >
           <el-button size="small" round>All transactions</el-button>
         </router-link>
+      </div> -->
       </div>
+      <div class="maker-block">
+        <template v-if="list.length > 0">
+          <div
+            v-if="!state.userAddressSelected"
+            style="
+              display: flex;
+              justify-content: center;
+              item-align: center;
+              margin: 10px;
+            "
+          >
+            <el-pagination
+              v-model:currentPage="currentPage"
+              v-model:page-size="pageSize"
+              :page-sizes="pagesizes"
+              :background="true"
+              layout="total, sizes, prev, pager, next, jumper"
+              :total="total"
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+            />
+          </div>
+
+          <el-table :data="list" stripe style="width: 100%">
+            <el-table-column label="TransactionID">
+              <template #default="scope">
+                <div>
+                  <el-tag
+                    v-if="scope.row.txTokenName"
+                    type="info"
+                    effect="plain"
+                    size="mini"
+                    >{{ scope.row.txTokenName }}
+                  </el-tag>
+                  <el-tag v-else type="danger" effect="plain" size="mini"
+                    >Invalid</el-tag
+                  >
+                </div>
+                <div>
+                  <TextLong :content="scope.row.transactionID">
+                    {{ scope.row.transactionID }}
+                  </TextLong>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column width="90">
+              <template #header>
+                From
+                <br />To
+              </template>
+              <template #default="scope">
+                <el-tag
+                  class="maker__chain-tag"
+                  type="success"
+                  effect="light"
+                  size="mini"
+                  >+ {{ evn_map[scope.row.fromChain] }}
+                </el-tag>
+                <el-tag
+                  class="maker__chain-tag"
+                  type="danger"
+                  effect="light"
+                  size="mini"
+                  >- {{ evn_map[scope.row.toChain] }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column style="min-width: 120px">
+              <template #header> User </template>
+              <template #default="scope">
+                <a :href="scope.row.userAddressHref" target="_blank">
+                  <TextLong
+                    :content="scope.row.replyAccount"
+                    placement="bottom"
+                  >
+                    {{ scope.row.replyAccount }}
+                  </TextLong>
+                </a>
+              </template>
+            </el-table-column>
+            <el-table-column width="145">
+              <template #header>
+                FromTx
+                <br />FromTime
+              </template>
+              <template #default="scope">
+                <a :href="scope.row.fromTxHref" target="_blank">
+                  <TextLong :content="scope.row['inData']?.['hash']">
+                    {{ scope.row['inData']?.['hash'] }}
+                  </TextLong>
+                </a>
+                <div class="table-timestamp">
+                  <TextLong
+                    :content="scope.row['inData']?.['createdAt']"
+                    placement="bottom"
+                    >{{ scope.row['inData']?.['createdAt'] }}
+                  </TextLong>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column width="145">
+              <template #header>
+                ToTx
+                <br />ToTime
+              </template>
+              <template #default="{ row }">
+                <a v-if="row.toTxHref" :href="row.toTxHref" target="_blank">
+                  <TextLong :content="row.toTx">{{ row.toTx }}</TextLong>
+                </a>
+                <TextLong v-else :content="row.toTx">{{ row.toTx }}</TextLong>
+                <div class="table-timestamp">
+                  <TextLong
+                    v-if="row.toTimeStamp && row.toTimeStamp != '0'"
+                    :content="formatDate(row.toTimeStamp)"
+                    placement="bottom"
+                  >
+                    {{ formatDate(row.toTimeStamp) }}
+                  </TextLong>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column width="120">
+              <template #header>
+                FromAmount
+                <br />ToAmount
+              </template>
+              <template #default="{ row }">
+                <TextLong :content="row['inData']?.value">
+                  <span class="amount-operator--plus">+</span>
+                  {{ row['inData']?.value }}
+                </TextLong>
+                <TextLong :content="row.toAmount" placement="bottom">
+                  <span class="amount-operator--minus">-</span>
+                  {{ row.toAmount }}
+                </TextLong>
+              </template>
+            </el-table-column>
+            <el-table-column prop="state" label="State" width="120">
+              <template #default="{ row }">
+                <el-tag
+                  :class="'state-tag--' + row.state"
+                  :type="stateTags[row.state]?.type"
+                  effect="dark"
+                  @click="onClickStateTag(row)"
+                  >{{ stateTags[row.state]?.label }}</el-tag
+                >
+              </template>
+            </el-table-column>
+
+            <el-table-column>
+              <template #header> 操作记录 </template>
+              <template #default="scope">
+                <div v-if="scope.row.userLog">
+                  <div>操作人：{{ scope.row.userLog.name }}</div>
+                  <div>
+                    操作：{{
+                      scope.row.userLog.updateStatus === 1
+                        ? '改为成功'
+                        : scope.row.userLog.updateStatus === 2
+                        ? '确认无回款'
+                        : ''
+                    }}
+                  </div>
+                  <div>
+                    操作时间：
+                    <div class="table-timestamp">
+                      {{ formatDate(scope.row.userLog.updateTime / 1000) }}
+                    </div>
+                  </div>
+                  <div v-if="scope.row.userLog.hash !== 'undefined'">
+                    绑定的hash：
+                    <a
+                      :href="getTxHref(scope.row, scope.row.userLog.hash)"
+                      target="_blank"
+                    >
+                      <TextLong
+                        :content="scope.row.userLog.hash"
+                        placement="bottom"
+                      >
+                        {{ scope.row.userLog.hash }}
+                      </TextLong>
+                    </a>
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column>
+              <template #header> 匹配的 tx hash </template>
+              <template #default="scope">
+                <div v-if="scope.row.warnTxList">
+                  <div :key="item" v-for="item in scope.row.warnTxList">
+                    <a :href="getTxHref(scope.row, item)" target="_blank">
+                      <TextLong :content="item" placement="bottom">
+                        {{ item }}
+                      </TextLong>
+                    </a>
+                  </div>
+                </div>
+              </template>
+            </el-table-column>
+            <el-table-column prop="state" label="操作">
+              <template #default="{ row }">
+                <div v-if="row.state !== 1">
+                  <el-button
+                    size="small"
+                    v-if="row.state === 3"
+                    style="margin-top: 5px"
+                    @click="onUpdate(row, 0)"
+                  >
+                    取消确认无回款
+                  </el-button>
+                  <el-button
+                    v-if="row.state === 5"
+                    size="small"
+                    style="margin-top: 5px; margin-left: 0"
+                    @click="onUpdate(row, 2)"
+                  >
+                    确认无回款
+                  </el-button>
+                  <el-button
+                    size="small"
+                    style="margin-top: 5px; margin-left: 0"
+                    v-if="row.state === 5 || row.state === 4"
+                    @click="
+                      () => {
+                        currentItem = row
+                        dialogVisible = true
+                      }
+                    "
+                  >
+                    确认回款成功
+                  </el-button>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+        </template>
+
+        <el-empty v-else description="Empty"></el-empty>
+      </div>
+      <el-backtop :right="100" :bottom="100" />
     </div>
-    <div class="maker-block">
-      <template v-if="list.length > 0">
-        <div
-          v-if="!state.userAddressSelected"
-          style="
-            display: flex;
-            justify-content: center;
-            item-align: center;
-            margin: 10px;
-          "
-        >
-          <el-pagination
-            v-model:currentPage="currentPage"
-            v-model:page-size="pageSize"
-            :page-sizes="pagesizes"
-            :background="true"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="total"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
+    <el-dialog v-model="dialogVisible" title="请输入tx hash" width="30%">
+      <div>
+        <div>
+          hash：
+          <ElInput
+            v-model="hash"
+            :type="'text'"
+            :style="{ margin: '10px 0' }"
           />
         </div>
-
-        <el-table :data="list" stripe style="width: 100%">
-          <el-table-column label="TransactionID">
-            <template #default="scope">
-              <div>
-                <el-tag
-                  v-if="scope.row.txTokenName"
-                  type="info"
-                  effect="plain"
-                  size="mini"
-                  >{{ scope.row.txTokenName }}
-                </el-tag>
-                <el-tag v-else type="danger" effect="plain" size="mini"
-                  >Invalid</el-tag
-                >
-              </div>
-              <div>
-                <TextLong :content="scope.row.transactionID">
-                  {{ scope.row.transactionID }}
-                </TextLong>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column width="90">
-            <template #header>
-              From
-              <br />To
-            </template>
-            <template #default="scope">
-              <el-tag
-                class="maker__chain-tag"
-                type="success"
-                effect="light"
-                size="mini"
-                >+ {{ scope.row.fromChainName }}
-              </el-tag>
-              <el-tag
-                class="maker__chain-tag"
-                type="danger"
-                effect="light"
-                size="mini"
-                >- {{ scope.row.toChainName }}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column style="min-width: 120px">
-            <template #header>
-              Maker
-              <br />User
-            </template>
-            <template #default="scope">
-              <a :href="scope.row.makerAddressHref" target="_blank">
-                <TextLong :content="scope.row.makerAddress">
-                  {{ scope.row.makerAddress }}
-                </TextLong>
-              </a>
-              <a :href="scope.row.userAddressHref" target="_blank">
-                <TextLong :content="scope.row.userAddress" placement="bottom">
-                  {{ scope.row.userAddress }}
-                </TextLong>
-              </a>
-            </template>
-          </el-table-column>
-          <el-table-column width="145">
-            <template #header>
-              FromTx
-              <br />FromTime
-            </template>
-            <template #default="scope">
-              <a :href="scope.row.fromTxHref" target="_blank">
-                <TextLong :content="scope.row.formTx">
-                  {{ scope.row.formTx }}
-                </TextLong>
-              </a>
-              <div class="table-timestamp">
-                <TextLong :content="scope.row.fromTimeStamp" placement="bottom"
-                  >{{ scope.row.fromTimeStampAgo }}
-                </TextLong>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column width="145">
-            <template #header>
-              ToTx
-              <br />ToTime
-            </template>
-            <template #default="{ row }">
-              <a v-if="row.toTxHref" :href="row.toTxHref" target="_blank">
-                <TextLong :content="row.toTx">{{ row.toTx }}</TextLong>
-              </a>
-              <TextLong v-else :content="row.toTx">{{ row.toTx }}</TextLong>
-              <div class="table-timestamp">
-                <TextLong
-                  v-if="row.toTimeStamp && row.toTimeStamp != '0'"
-                  :content="row.toTimeStamp"
-                  placement="bottom"
-                >
-                  {{ row.toTimeStampAgo }}
-                  <span v-if="row.tradeDuration >= 0"
-                    >({{ row.tradeDuration }}s)</span
-                  >
-                </TextLong>
-                <span v-else>{{ row.toTimeStampAgo }}</span>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column width="120">
-            <template #header>
-              FromAmount
-              <br />ToAmount
-            </template>
-            <template #default="{ row }">
-              <TextLong :content="row.fromAmountFormat">
-                <span class="amount-operator--plus">+</span>
-                {{ row.fromAmountFormat }}
-              </TextLong>
-              <TextLong
-                :content="
-                  row.toAmountFormat +
-                  (row.toAmount <= 0
-                    ? ` (NeedTo: ${row.needTo.amountFormat})`
-                    : '')
-                "
-                placement="bottom"
-              >
-                <span class="amount-operator--minus">-</span>
-                {{ row.toAmountFormat }}
-              </TextLong>
-            </template>
-          </el-table-column>
-          <el-table-column label="Profit" width="150">
-            <template #default="{ row }">
-              <div v-if="row.profitUSD > 0" class="amount-operator--plus">
-                +{{ row.profitUSD }} USD
-              </div>
-              <div v-else class="amount-operator--minus">
-                {{ row.profitUSD }} USD
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="state" label="State" width="140">
-            <template #default="{ row }">
-              <el-tag
-                :class="'state-tag--' + row.state"
-                :type="stateTags[row.state]?.type"
-                effect="dark"
-                @click="onClickStateTag(row)"
-                >{{ stateTags[row.state]?.label }}</el-tag
-              >
-            </template>
-          </el-table-column>
-        </el-table>
+      </div>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogVisible = false">Cancel</el-button>
+          <el-button type="primary" @click="handleConfirm"> Confirm </el-button>
+        </span>
       </template>
-
-      <el-empty v-else description="Empty"></el-empty>
-    </div>
-    <el-backtop :right="100" :bottom="100" />
+    </el-dialog>
+    <Tx />
   </div>
 </template>
 
 <script lang="ts" setup>
 import TextLong from '@/components/TextLong.vue'
+import Tx from './Tx.vue'
+import Login from './Login.vue'
+import { MakerNode, makerWealth, useTransactionHistory } from '@/hooks/maker'
+import { submit } from '@/hooks/login'
 import {
-  makerInfo,
-  MakerNode,
-  makerWealth,
-  useTransactionHistory,
-  requestStatistics,
-} from '@/hooks/maker'
-// import { BigNumber } from 'bignumber.js'
-import { ElNotification } from 'element-plus'
+  ElNotification,
+  ElMessage,
+  ElLoading,
+  ElMessageBox,
+} from 'element-plus'
 import { BigNumberish, ethers, providers } from 'ethers'
 import dayjs from 'dayjs'
 import {
@@ -399,10 +466,18 @@ import {
   TransactionZksync,
   utils,
 } from 'orbiter-sdk'
-import { ref, computed, inject, reactive, toRef, watch } from 'vue'
+import { ref, computed, inject, reactive, watch, toRef } from 'vue'
 import Web3 from 'web3'
+import { getTotals, makerInfo } from '../hooks/maker'
+import { $env } from '../env'
 
-// mainnet > Mainnet, arbitrum > Arbitrum, zksync > zkSync
+const stateTags = {
+  1: { label: '成功', type: 'success' },
+  2: { label: '人工确认成功', type: 'success' },
+  3: { label: '人工确认无回款', type: 'info' },
+  4: { label: '多条tx匹配', type: 'warning' },
+  5: { label: '失败', type: 'danger' },
+}
 const CHAIN_NAME_MAPPING = {
   mainnet: 'Mainnet',
   arbitrum: 'Arbitrum',
@@ -410,12 +485,11 @@ const CHAIN_NAME_MAPPING = {
   polygon: 'Polygon',
   optimism: 'Optimism',
 }
-const stateTags = {
-  0: { label: 'From: check', type: 'info' },
-  1: { label: 'From: okay', type: 'warning' },
-  2: { label: 'To: check', type: 'info' },
-  3: { label: 'To: okay', type: 'success' },
-  20: { label: 'To: failed', type: 'danger' },
+const mappingChainName = (chainName: string) => {
+  if (CHAIN_NAME_MAPPING[chainName]) {
+    return CHAIN_NAME_MAPPING[chainName]
+  }
+  return chainName
 }
 const status = [
   {
@@ -432,7 +506,6 @@ const status = [
 const DEFAULT_TIME_DURATION = 1 * 24 * 60 * 60 * 1000
 
 const makerAddressSelected: any = inject('makerAddressSelected')
-// const exchangeRates: any = inject('exchangeRates')
 const state = reactive({
   rangeDate: [] as Date[],
   fromChainId: '',
@@ -476,12 +549,12 @@ const shortcuts = [
     },
   },
 ]
-const statistics = reactive({
-  total: 0,
-  fromAmount: 0,
-  toAmount: 0,
-  profit: {},
-  profitAmount: 0,
+const statistics = ref({
+  successByMatchedCount: 0,
+  successByAdminCount: 0,
+  failByAdminCount: 0,
+  failByMultiCount: 0,
+  failByUnknownCount: 0,
 })
 const makerNodes: any = ref([])
 // computeds
@@ -492,91 +565,75 @@ const list = computed(() =>
       item.userAddress == state.userAddressSelected
   )
 )
-
-const userAddressList = computed(() => {
-  const userAddressList: { address: string; count: number }[] = []
-  for (const item of makerNodes.value) {
-    if (!item.userAddress) {
-      continue
-    }
-
-    const userAddress = userAddressList.find(
-      (item1) => item.userAddress == item1.address
-    )
-    if (userAddress) {
-      userAddress.count++
-      continue
-    }
-
-    userAddressList.push({ address: item.userAddress, count: 1 })
-  }
-
-  // Sort by count desc
-  userAddressList.sort((a, b) => b.count - a.count)
-
-  return userAddressList
+const evn_map = ref({
+  1: 'mainnet',
+  2: 'arbitrum',
+  3: 'zksynclite',
+  7: 'optimism',
+  15: 'bsc',
+  14: 'zksyncera',
+  4: 'starknet',
+  16: 'Arbitrum Nova',
 })
-// const diffAmountTotal = computed(() => {
-//   let num = new BigNumber(0)
-//   for (const item of list.value) {
-//     if (!item.profitUSD) {
-//       continue
-//     }
 
-//     num = num.plus(item.profitUSD)
-//   }
-//   return num.toNumber().toFixed(2)
-// })
-// const diffAmountTotalETH = computed(() => {
-//   const num = new BigNumber(diffAmountTotal.value).multipliedBy(
-//     exchangeRates?.value?.ETH || 0
-//   )
-//   return num.toFixed(5)
-// })
-// const diffAmountTotalCNY = computed(() => {
-//   const num = new BigNumber(diffAmountTotal.value).multipliedBy(
-//     exchangeRates?.value?.CNY || 0
-//   )
-//   return num.toFixed(2)
-// })
-const chains = toRef(makerInfo.state, 'chains')
-const loadingWealths = toRef(makerWealth.state, 'loading')
-const wealths = toRef(makerWealth.state, 'list')
+const formatDate = (timestamp: number) => {
+  return dayjs(timestamp * 1000).format()
+}
+
+const dialogVisible = ref(false)
+const currentItem = ref<any>()
+const hash = ref<string>()
+
 const loadingNodes = ref(false)
-const loadingStatistics = ref(false)
 const currentPage = ref(1)
-const pageSize = ref(100)
+const pageSize = ref(10)
 const total = ref(0)
-const pagesizes = computed(() =>
-  Array.from(new Set([100, 200, 300, 400, Math.ceil(total.value / 100) * 100]))
-)
+const pagesizes = computed(() => Array.from(new Set([20, 50, 100, 200])))
 
 const handleSizeChange = (val: number) => {
   pageSize.value = val
   getMakerNodes({ size: val })
 }
+
 const handleCurrentChange = (val: number) => {
   currentPage.value = val
   getMakerNodes({ current: val })
 }
+
+async function getStatistics() {
+  const res = await getTotals({
+    fromChainId: state.fromChainId ? +state.fromChainId : null,
+    toChainId: state.toChainId ? +state.toChainId : null,
+    rangeDate: state.rangeDate,
+  })
+  statistics.value = res
+}
+
 const getMakerWealth = () => makerWealth.get(makerAddressSelected?.value)
 const reset = () => {
-  state.rangeDate = [dayjs().startOf('d').toDate(), dayjs().endOf('d').toDate()]
+  state.rangeDate = [
+    dayjs().subtract(10, 'day').toDate(),
+    dayjs().endOf('d').toDate(),
+  ]
   state.fromChainId = ''
   state.toChainId = ''
   state.userAddressSelected = ''
   state.keyword = ''
   state.status = -1
 
-  getMakerNodes()
   getStatistics()
+  getMakerNodes()
 }
+
+
 let prevMore = {}
 const clickApply = () => {
-  getMakerNodes({ current: 1 })
   getStatistics()
+  getMakerNodes({ current: 1 })
 }
+
 const getMakerNodes = async (more: any = {}) => {
+  if (loadingNodes.value) return
   loadingNodes.value = true
   prevMore = {
     ...prevMore,
@@ -588,8 +645,8 @@ const getMakerNodes = async (more: any = {}) => {
     total: _total,
   } = await useTransactionHistory({
     makerAddress: makerAddressSelected?.value,
-    fromChain: state.fromChainId ? +state.fromChainId : null,
-    toChain: state.toChainId ? +state.toChainId : null,
+    fromChainId: state.fromChainId ? +state.fromChainId : null,
+    toChainId: state.toChainId ? +state.toChainId : null,
     rangeDate: state.rangeDate,
     keyword: state.keyword.trim(),
     state: state.status,
@@ -599,41 +656,69 @@ const getMakerNodes = async (more: any = {}) => {
   makerNodes.value = _list.value
   total.value = _total.value
 }
-const getStatistics = async (more: any = {}) => {
-  loadingStatistics.value = true
-  try {
-    prevMore = {
-      ...prevMore,
-      ...more,
-    }
-    const result = await requestStatistics({
-      makerAddress: makerAddressSelected?.value,
-      fromChain: state.fromChainId ? +state.fromChainId : null,
-      toChain: state.toChainId ? +state.toChainId : null,
-      rangeDate: state.rangeDate,
-      keyword: state.keyword.trim(),
-      state: state.status,
-      ...prevMore,
+
+const chains = toRef(makerInfo.state, 'chains')
+
+watch(chains, () => {
+  if (!chains.value || chains.value.length) {
+    return
+  }
+  for (let index = 0; index < chains.value.length; index++) {
+    const element = chains.value[index]
+    evn_map[element.chainId] = element.chainName
+  }
+})
+
+const onUpdate = async (item: MakerNode, status: 0 | 1 | 2, hash?: string) => {
+  const token = window.sessionStorage.getItem('token')
+
+  if (!token) {
+    ElMessage({
+      showClose: true,
+      message: '请先登录',
+      type: 'error',
     })
-    if (result) {
-      statistics.total = result.trxCount
-      statistics.fromAmount = result.fromAmount
-      statistics.toAmount = result.toAmount
-      statistics.profitAmount = result.profitAmount
-      statistics.profit = result.profit
+    return false
+  }
+  if (status !== 1) {
+    await ElMessageBox.confirm('确认更改?')
+  }
+  const loading = ElLoading.service({ fullscreen: true })
+  try {
+    const ok = await submit(status, item.id.toString(), hash)
+    if (ok) {
+      ElMessage({
+        showClose: true,
+        message: '操作成功',
+        type: 'success',
+      })
+      await getMakerNodes()
+      await getStatistics()
+    } else {
+      throw Error('submit fail')
     }
-  } catch (error) {
-    throw new Error(error)
+  } catch {
+    ElMessage({
+      showClose: true,
+      message: '操作失败',
+      type: 'error',
+    })
   } finally {
-    loadingStatistics.value = false
+    loading.close()
   }
 }
-// Methods
-const mappingChainName = (chainName: string) => {
-  if (CHAIN_NAME_MAPPING[chainName]) {
-    return CHAIN_NAME_MAPPING[chainName]
+
+const handleConfirm = () => {
+  dialogVisible.value = false
+  if (!currentItem.value || !hash.value) {
+    return
   }
-  return chainName
+  onUpdate(currentItem.value, 1, hash.value)
+}
+
+const getTxHref = (v: MakerNode, hash: string) => {
+  const txExploreUrl = $env.txExploreUrl
+  return `${txExploreUrl[v.toChain]}${hash}`
 }
 const transferNeedTo = async (
   fromAddress: string,
@@ -652,14 +737,14 @@ const transferNeedTo = async (
   }
 
   // Check wallet
-  const walletAccount = (
-    await ethereum.request({ method: 'eth_requestAccounts' })
-  )?.[0]
-  if (!utils.equalsIgnoreCase(walletAccount, fromAddress)) {
-    throw new Error(
-      `Please switch the address to ${fromAddress} in the wallet!`
-    )
-  }
+  // const walletAccount = (
+  //   await ethereum.request({ method: 'eth_requestAccounts' })
+  // )?.[0]
+  // if (!utils.equalsIgnoreCase(walletAccount, fromAddress)) {
+  //   throw new Error(
+  //     `Please switch the address to ${fromAddress} in the wallet!`
+  //   )
+  // }
 
   // Ensure networkId
   await utils.ensureMetamaskNetwork(needTo.chainId, ethereum)
@@ -775,8 +860,11 @@ const onClickPageButton = (next: boolean) => {
   ]
   getMakerNodes()
 }
-const init = () => getMakerWealth() + getMakerNodes() + getStatistics()
-
+const init = () => {
+  getMakerWealth()
+  getMakerNodes()
+  getStatistics()
+}
 makerInfo.get()
 reset()
 init()
@@ -785,6 +873,10 @@ watch(() => makerAddressSelected?.value, init)
 </script>
 
 <style lang="scss">
+.head {
+  display: flex;
+  justify-content: flex-end;
+}
 .maker-header--balances__info {
   white-space: nowrap;
 }

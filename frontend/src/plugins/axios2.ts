@@ -8,10 +8,7 @@ import { ElNotification } from 'element-plus'
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 const config = {
-  baseURL:
-    process.env.historyApiUrl || $env.historyApiUrl || 'http://localhost:3000/',
-  // timeout: 60 * 1000, // Timeout
-  // withCredentials: true, // Check cross-site Access-Control
+  baseURL: 'http://175.41.233.153:3000',
 }
 
 const http = axios.create(config)

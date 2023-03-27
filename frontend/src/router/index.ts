@@ -1,6 +1,4 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
-import Home from '../views/Home.vue'
-import MakerHistory from '../views/MakerHistory.vue'
 import Setting from '../views/Setting/index.vue'
 
 const routes: Array<RouteRecordRaw> = [
@@ -26,12 +24,6 @@ const routes: Array<RouteRecordRaw> = [
     path: '/setting',
     name: 'Setting',
     component: Setting,
-  },
-  {
-    path: '/maker/history',
-    name: 'MakerHistory',
-    component: MakerHistory,
-    meta: { navHide: true },
   },
 ]
 

@@ -3,6 +3,15 @@ import { $axios } from '@/plugins/axios'
 import { reactive, ref } from 'vue'
 import http from '@/plugins/axios2'
 
+const chainNameToId = {
+  ethereum: 1,
+  arbitrum: 2,
+  optimism: 7,
+  starknet: 4,
+  zksyncera: 14,
+  zksynclite: 3,
+}
+
 type MakerInfoChains = {
   chainId: string
   chainName: string
@@ -18,9 +27,8 @@ export const makerInfo = {
   }),
 
   async get() {
-    const resp = await $axios.get<MakerInfo>('maker')
+    const resp = await $axios.get<MakerInfo>('http://iris_dashboard.orbiter.finance:3002/maker')
     const data = resp.data
-
     // unshift All item
     data.chains.unshift({ chainId: '', chainName: 'All' })
 
@@ -78,19 +86,27 @@ function transforeData(list: any = []) {
 
   // add hrefs
   for (const item of list) {
-    item['makerAddressHref'] = accountExploreUrl[item.fromChain] + item['makerAddress']
-    item['userAddressHref'] = accountExploreUrl[item.toChain] + item['userAddress']
-    item['fromTxHref'] = $env.txExploreUrl[item.fromChain] + item['fromTx']
+    item['makerAddressHref'] =
+      accountExploreUrl[item.fromChain] + item['replySender']
+    item['userAddressHref'] =
+      accountExploreUrl[item.toChain] + item['inData']?.['replyAccount']
+    item['fromTxHref'] =
+      $env.txExploreUrl[item.fromChain] + item['inData']?.['hash']
     item['toTxHref'] = ''
-    if (item['toTx'] && item['toTx'] != '0x') {
-      item['toTxHref'] = $env.txExploreUrl[item.toChain] + item['toTx']
-    }
-    item['txTokenName'] = item.tokenName
+
+    item['txTokenName'] = item['inData']?.symbol
     item.transactionID = item.transcationId
-    item.formTx = item.fromTx
+    item.formTx = item['inData']?.['hash']
+
+    if (item.matchedTx) {
+      item.toTx = item.matchedTx.tx_hash
+      item.toTxHref = $env.txExploreUrl[item.toChain] + item.matchedTx.tx_hash
+      item.toTimeStamp = item.matchedTx.timestamp
+    }
+
     // item.fromAmountFormat = +item.fromValue / Math.pow(10, 18)
     // item.toAmountFormat = +item.toValue / Math.pow(10, 18)
-    
+
     /*
       item.state = 20
       if (item.status==1 || item.status==99) {
@@ -112,115 +128,57 @@ function transforeData(list: any = []) {
       }
     */
 
-    item.state = 20
-    if (item.fromStatus == 0) {
-      item.state = 0
-    } else if (item.fromStatus == 1 || item.fromStatus == 99) {
-      item.state = 1
-    }
-    if (item.status == 0) {
-      if (item.fromStatus == 1 || item.fromStatus == 99) item.state = 2
-    } else if (item.status == 1 || item.status == 99) {
-      item.state = 3
-    }
-
-  }
-}
-async function getMakerNode(params: any = {}) {
-  const { rangeDate = [], makerAddress, fromChain, toChain, userAddress, keyword } = params
-  transforeDate(params)
-
-  const resp = await $axios.get<MakerNode[]>('maker/nodes', {
-    params,
-  })
-
-  const list = resp.data
-  transforeData(list)
-  return list
-}
-export const requestStatistics = async (params: any = {}) => {
-  const loading = ref(false)
-  if (params.makerAddress) {
-    transforeDate(params)
-    if ($env.starknetL1MapL2['mainnet-alpha'][params.makerAddress.toLowerCase()]) {
-      params.makerAddress = `${params.makerAddress},${$env.starknetL1MapL2['mainnet-alpha'][params.makerAddress.toLowerCase()]}`;
-    }
-    loading.value = true
-    try {
-      const res: any = await http.get(`/api/transaction/statistics`, {
-        params: params
-      })
-      if (res.code === 0) {
-        const data = res.data
-        return data;
-      }
-    } catch (error) {
-      console.error(error)
-    }
-    loading.value = false
+    // item.state = 20
+    // if (item.fromStatus == 0) {
+    //   item.state = 0
+    // } else if (item.fromStatus == 1 || item.fromStatus == 99) {
+    //   item.state = 1
+    // }
+    // if (item.status == 0) {
+    //   if (item.fromStatus == 1 || item.fromStatus == 99) item.state = 2
+    // } else if (item.status == 1 || item.status == 99) {
+    //   item.state = 3
+    // }
+    // if (item.status === 'matched') {
+    //   item.state = 20
+    // } else {
+    //   item.state = 3
+    // }
   }
 }
 
-
-export const useMakerNodes = async (
-  makerAddress: string,
-  fromChain: number = 0,
-  toChain: number = 0,
-  rangeDate: Date[] = [],
-  keyword = '',
-  userAddress = ''
-) => {
-  const loading = ref(false)
-  const list: any = ref([])
-
-  if (makerAddress) {
-    loading.value = true
-    try {
-      list.value = await getMakerNode({rangeDate, makerAddress, fromChain, toChain, userAddress, keyword})
-    } catch (error) {
-      console.error(error)
-    }
-    loading.value = false
-  }
-
-  return {
-    list,
-    loading,
-  }
-}
 export const useTransactionHistory = async (params: any = {}) => {
   const loading = ref(false)
   const list: any = ref([])
-  const size = ref(params.size || 100)
+  const size = ref(params.size || 10)
   const current = ref(params.current || 1)
   const total = ref(0)
-  if (params.makerAddress) {
-    transforeDate(params)
-    loading.value = true
-    try {
-      const res: any = await http.get(`/api/transactions`, {
-        params: {
-          ...params,
-          rangeDate: null,
-          size: size.value,
-          current: current.value
-        }
-      })
-      if (res.code === 0) {
-        const data = res.data
-        transforeData(data)
-        list.value = data
-        total.value = res.total
-      }
-    } catch (error) {
-      console.error(error)
+  transforeDate(params)
+  loading.value = true
+  try {
+    const res: any = await http.get(`/newlist`, {
+      params: {
+        ...params,
+        rangeDate: null,
+        size: size.value,
+        current: current.value,
+        transactionId: params.keyword ?? '',
+      },
+    })
+    if (res.code === 0) {
+      const data = res.data
+      transforeData(data)
+      list.value = data
+      total.value = res.total
     }
-    loading.value = false
+  } catch (error) {
+    console.error(error)
   }
+  loading.value = false
   return {
     list,
     loading,
-    total
+    total,
   }
 }
 
@@ -263,4 +221,14 @@ export const makerWealth = {
     }
     makerWealth.state.loading = false
   },
+}
+
+export const getTotals = async (data: any) => {
+  transforeDate(data)
+  try {
+    const res: any = await http.get(`/statistic`, { params: { ...data } })
+    return res.data
+  } catch (error) {
+    console.error(error)
+  }
 }

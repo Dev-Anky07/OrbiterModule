@@ -1,4 +1,5 @@
 import { metamaskChains } from '../configs/chains'
+import { ethers } from 'ethers'
 
 export default {
   getChainInfo(netChainID) {
@@ -74,13 +75,15 @@ export default {
       (date.getMonth() + 1 < 10
         ? '0' + (date.getMonth() + 1)
         : date.getMonth() + 1) + '-'
-    const D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' '
+    const D =
+      (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' '
     const h =
       (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
     const m =
       (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) +
       ':'
-    const s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+    const s =
+      date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
     const result = Y + M + D + h + m + s
     return result
   },
@@ -92,4 +95,12 @@ export default {
     }
     return ''
   },
+}
+
+export function parseUnits(value: string, uint: number) {
+  try {
+    return ethers.utils.formatUnits(value, uint)
+  } catch (error) {
+    ;('')
+  }
 }
