@@ -112,6 +112,13 @@ function transforeData(list: any = []) {
     item['txTokenName'] = item['inData']?.symbol
     item.transactionID = item.transcationId
     item.formTx = item['inData']?.['hash']
+    
+
+    if (item.matchedScanTx) {
+      item.toTx = item.matchedScanTx.txHash
+      item.toTxHref = $env.txExploreUrl[item.toChain] + item.matchedScanTx.txHash
+      item.toTimeStamp = parseInt((new Date(item.matchedScanTx.createdAt).getTime() / 1000).toString(), 10)
+    }
 
     if (item.matchedTx) {
       item.toTx = item.matchedTx.tx_hash
