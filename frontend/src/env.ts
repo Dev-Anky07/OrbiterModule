@@ -112,7 +112,7 @@ export const $env = {
     22: 'https://goerli.arbiscan.io/address/',
     3: 'https://zkscan.io/explorer/accounts/',
     33: 'https://goerli.zkscan.io/explorer/accounts/', // /explorer/transactions/   /explorer/accounts/
-    4: 'https://beta.voyager.online/contract/',
+    4: 'https://viewblock.io/starknet/contract/',
     44: 'https://beta-goerli.voyager.online/contract/',
     6: 'https://polygonscan.com/address/',
     66: 'https://mumbai.polygonscan.com/address/',
