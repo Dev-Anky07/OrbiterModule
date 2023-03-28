@@ -114,7 +114,7 @@
           <el-col :span="5">
             <div class="title">minAmount</div>
             <el-input
-              style="width: 200px;"
+              style="width: 200px"
               v-model="state.minAmount"
               placeholder="Input minAmount"
               :clearable="true"
@@ -123,7 +123,7 @@
           <el-col :span="5">
             <div class="title">maxAmount</div>
             <el-input
-              style="width: 200px;"
+              style="width: 200px"
               v-model="state.maxAmount"
               placeholder="Input maxAmount"
               :clearable="true"
@@ -165,6 +165,12 @@
         <div>人工确认无回款: {{ statistics.failByAdminCount }}</div>
         <div>多条tx匹配: {{ statistics.failByMultiCount }}</div>
         <div>失败: {{ statistics.failByUnknownCount }}</div>
+
+        <div>
+          待回款: {{ statistics.pendingPay.ETH }}ETH /
+          {{ statistics.pendingPay.USDC }}USDC /
+          {{ statistics.pendingPay.USDT }}USDT
+        </div>
         <!-- <div style="color: #67c23a; font-weight: 600">
         +{{ statistics.profit['USD'] }} USD
       </div>
@@ -590,6 +596,11 @@ const statistics = ref({
   failByAdminCount: 0,
   failByMultiCount: 0,
   failByUnknownCount: 0,
+  pendingPay: {
+    ETH: '',
+    USDC: '',
+    USDT: '',
+  },
 })
 const makerNodes: any = ref([])
 // computeds
@@ -659,7 +670,6 @@ const reset = () => {
   getStatistics()
   getMakerNodes()
 }
-
 
 let prevMore = {}
 const clickApply = () => {

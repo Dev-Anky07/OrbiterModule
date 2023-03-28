@@ -2,8 +2,8 @@ import { $env } from '@/env'
 import { $axios } from '@/plugins/axios'
 import { reactive, ref } from 'vue'
 import http from '@/plugins/axios2'
-import { ethers } from 'ethers';
-import chains from '../chain';
+import { ethers } from 'ethers'
+import chains from '../chain'
 const chainNameToId = {
   ethereum: 1,
   arbitrum: 2,
@@ -28,7 +28,9 @@ export const makerInfo = {
   }),
 
   async get() {
-    const resp = await $axios.get<MakerInfo>('http://iris_dashboard.orbiter.finance:3002/maker')
+    const resp = await $axios.get<MakerInfo>(
+      'http://iris_dashboard.orbiter.finance:3002/maker'
+    )
     const data = resp.data
     // unshift All item
     data.chains.unshift({ chainId: '', chainName: 'All' })
@@ -112,12 +114,25 @@ function transforeData(list: any = []) {
     item['txTokenName'] = item['inData']?.symbol
     item.transactionID = item.transcationId
     item.formTx = item['inData']?.['hash']
-    
 
     if (item.matchedScanTx) {
-      item.toTx = item.matchedScanTx.txHash
-      item.toTxHref = $env.txExploreUrl[item.toChain] + item.matchedScanTx.txHash
-      item.toTimeStamp = parseInt((new Date(item.matchedScanTx.createdAt).getTime() / 1000).toString(), 10)
+      const toTx =
+        item.matchedScanTx.txHash || item.matchedScanTx.hash || item.matchedScanTx._id
+
+      const createTime = item.matchedScanTx.createdAt
+        ? parseInt(
+            (
+              new Date(item.matchedScanTx.createdAt).getTime() / 1000
+            ).toString(),
+            10
+          )
+        : item.matchedScanTx.timestamp
+        ? item.matchedScanTx.timestamp
+        : ''
+
+      item.toTx = toTx
+      item.toTxHref = $env.txExploreUrl[item.toChain] + toTx
+      item.toTimeStamp = createTime
     }
 
     if (item.matchedTx) {
@@ -125,14 +140,20 @@ function transforeData(list: any = []) {
       item.toTxHref = $env.txExploreUrl[item.toChain] + item.matchedTx.tx_hash
       item.toTimeStamp = item.matchedTx.timestamp
     }
-    
+
     if (item.inData) {
       let toSymbol = item.inData.extra?.toSymbol
       if (!toSymbol) {
         toSymbol = item.inData.symbol
       }
-      item.formatFromAmount = ethers.utils.formatUnits(item.inData.value, getDecimals(item.fromChain, item.inData.symbol));
-      item.formatToAmount = ethers.utils.formatUnits(item.toAmount, getDecimals(item.toChain, toSymbol));
+      item.formatFromAmount = ethers.utils.formatUnits(
+        item.inData.value,
+        getDecimals(item.fromChain, item.inData.symbol)
+      )
+      item.formatToAmount = ethers.utils.formatUnits(
+        item.toAmount,
+        getDecimals(item.toChain, toSymbol)
+      )
     }
     // item.fromAmountFormat = +item.fromValue / Math.pow(10, 18)
     // item.toAmountFormat = +item.toValue / Math.pow(10, 18)
