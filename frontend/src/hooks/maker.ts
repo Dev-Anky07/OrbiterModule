@@ -4,14 +4,6 @@ import { reactive, ref } from 'vue'
 import http from '@/plugins/axios2'
 import { ethers } from 'ethers'
 import chains from '../chain'
-const chainNameToId = {
-  ethereum: 1,
-  arbitrum: 2,
-  optimism: 7,
-  starknet: 4,
-  zksyncera: 14,
-  zksynclite: 3,
-}
 
 type MakerInfoChains = {
   chainId: string
@@ -117,7 +109,9 @@ function transforeData(list: any = []) {
 
     if (item.matchedScanTx) {
       const toTx =
-        item.matchedScanTx.txHash || item.matchedScanTx.hash || item.matchedScanTx._id
+        item.matchedScanTx.txHash ||
+        item.matchedScanTx.hash ||
+        item.matchedScanTx._id
 
       const createTime = item.matchedScanTx.createdAt
         ? parseInt(
@@ -139,6 +133,11 @@ function transforeData(list: any = []) {
       item.toTx = item.matchedTx.tx_hash
       item.toTxHref = $env.txExploreUrl[item.toChain] + item.matchedTx.tx_hash
       item.toTimeStamp = item.matchedTx.timestamp
+    }
+
+    if (item.state === 2) {
+      item.toTx = item.userLog.hash
+      item.toTxHref = $env.txExploreUrl[item.toChain] + item.toTx
     }
 
     if (item.inData) {

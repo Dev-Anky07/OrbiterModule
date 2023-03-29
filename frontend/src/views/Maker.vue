@@ -161,48 +161,19 @@
           </el-button>
         </el-button-group>
         <div>成功: {{ statistics.successByMatchedCount }}</div>
-        <div>人工确认成功: {{ statistics.successByAdminCount }}</div>
-        <div>人工确认无回款: {{ statistics.failByAdminCount }}</div>
         <div>多条tx匹配: {{ statistics.failByMultiCount }}</div>
-        <div>失败: {{ statistics.failByUnknownCount }}</div>
+        <div>待确认: {{ statistics.failByUnknownCount }}</div>
+        <div>存疑: {{ statistics.doubtByAdminCount }}</div>
 
         <div>
           待回款: {{ statistics.pendingPay.ETH }}ETH /
           {{ statistics.pendingPay.USDC }}USDC /
           {{ statistics.pendingPay.USDT }}USDT
         </div>
-        <!-- <div style="color: #67c23a; font-weight: 600">
-        +{{ statistics.profit['USD'] }} USD
       </div>
-      <el-dropdown>
-        <div style="color: #409eff; font-weight: 600">
-          +{{ statistics.profit['ETH'] }} ETH
-        </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item
-              v-for="(val, key) in statistics.profit"
-              :key="key"
-            >
-              <div style="color: #409eff; font-weight: 600">
-                + {{ val }} {{ key }}
-              </div>
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown> -->
-
-        <!-- <div style="color: #f56c6c; font-weight: 600">
-        +{{ statistics.profit['CNY'] }} CNY
-      </div> -->
-        <!-- <div style="margin-left: auto">
-        <router-link
-          :to="`/maker/history?makerAddress=${makerAddressSelected}`"
-          target="_blank"
-        >
-          <el-button size="small" round>All transactions</el-button>
-        </router-link>
-      </div> -->
+      <div class="maker-block maker-header maker-header__statistics">
+        <div>总人工确认成功: {{ statistics.successByAdminCount }}</div>
+        <div>人工待回款: {{ statistics.failByAdminCount }}</div>
       </div>
       <div class="maker-block">
         <template v-if="list.length > 0">
@@ -227,7 +198,12 @@
             />
           </div>
 
-          <el-table :data="list" stripe style="width: 100%">
+          <el-table
+            :data="list"
+            stripe
+            style="width: 100%"
+            @row-click="onRowClick"
+          >
             <el-table-column label="TransactionID">
               <template #default="scope">
                 <div>
@@ -260,14 +236,14 @@
                   type="success"
                   effect="light"
                   size="mini"
-                  >+ {{ evn_map[scope.row.fromChain] }}
+                  >+ {{ getChainName(scope.row.fromChain) }}
                 </el-tag>
                 <el-tag
                   class="maker__chain-tag"
                   type="danger"
                   effect="light"
                   size="mini"
-                  >- {{ evn_map[scope.row.toChain] }}
+                  >- {{ getChainName(scope.row.toChain) }}
                 </el-tag>
               </template>
             </el-table-column>
@@ -297,9 +273,9 @@
                 </a>
                 <div class="table-timestamp">
                   <TextLong
-                    :content="scope.row['inData']?.['createdAt']"
+                    :content="scope.row['inData']?.['timestamp']"
                     placement="bottom"
-                    >{{ scope.row['inData']?.['createdAt'] }}
+                    >{{ scope.row['inData']?.['timestamp'] }}
                   </TextLong>
                 </div>
               </template>
@@ -380,13 +356,17 @@
                         ? '改为成功'
                         : scope.row.userLog.updateStatus === 2
                         ? '确认无回款'
+                        : scope.row.userLog.updateStatus === 3
+                        ? '标记存疑'
+                        : scope.row.userLog.updateStatus === 0
+                        ? '取消确认无回款'
                         : ''
                     }}
                   </div>
                   <div>
                     操作时间：
                     <div class="table-timestamp">
-                      {{ formatDate(scope.row.userLog.updateTime / 1000) }}
+                      {{ dayjs(scope.row.userLog.updateTime).format() }}
                     </div>
                   </div>
                   <div v-if="scope.row.userLog.hash !== 'undefined'">
@@ -420,41 +400,6 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column prop="state" label="操作">
-              <template #default="{ row }">
-                <div v-if="row.state !== 1">
-                  <el-button
-                    size="small"
-                    v-if="row.state === 3"
-                    style="margin-top: 5px"
-                    @click="onUpdate(row, 0)"
-                  >
-                    取消确认无回款
-                  </el-button>
-                  <el-button
-                    v-if="row.state === 5"
-                    size="small"
-                    style="margin-top: 5px; margin-left: 0"
-                    @click="onUpdate(row, 2)"
-                  >
-                    确认无回款
-                  </el-button>
-                  <el-button
-                    size="small"
-                    style="margin-top: 5px; margin-left: 0"
-                    v-if="row.state === 5 || row.state === 4"
-                    @click="
-                      () => {
-                        currentItem = row
-                        dialogVisible = true
-                      }
-                    "
-                  >
-                    确认回款成功
-                  </el-button>
-                </div>
-              </template>
-            </el-table-column>
           </el-table>
         </template>
 
@@ -462,40 +407,18 @@
       </div>
       <el-backtop :right="100" :bottom="100" />
     </div>
-    <el-dialog v-model="dialogVisible" title="请输入tx hash" width="30%">
-      <div>
-        <div>
-          hash：
-          <ElInput
-            v-model="hash"
-            :type="'text'"
-            :style="{ margin: '10px 0' }"
-          />
-        </div>
-      </div>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">Cancel</el-button>
-          <el-button type="primary" @click="handleConfirm"> Confirm </el-button>
-        </span>
-      </template>
-    </el-dialog>
-    <Tx />
+    <!-- <Tx /> -->
+    <DetailModal ref="detailModal" @update="onUpdate" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import TextLong from '@/components/TextLong.vue'
-import Tx from './Tx.vue'
+// import Tx from './Tx.vue'
 import Login from './Login.vue'
-import { MakerNode, makerWealth, useTransactionHistory } from '@/hooks/maker'
-import { submit } from '@/hooks/login'
-import {
-  ElNotification,
-  ElMessage,
-  ElLoading,
-  ElMessageBox,
-} from 'element-plus'
+import DetailModal from './DetailModal.vue'
+import { MakerNode, useTransactionHistory } from '@/hooks/maker'
+import { ElNotification } from 'element-plus'
 import { BigNumberish, ethers, providers } from 'ethers'
 import dayjs from 'dayjs'
 import {
@@ -506,17 +429,21 @@ import {
   TransactionZksync,
   utils,
 } from 'orbiter-sdk'
-import { ref, computed, inject, reactive, watch, toRef } from 'vue'
+import { ref, computed, inject, reactive, toRef } from 'vue'
 import Web3 from 'web3'
 import { getTotals, makerInfo } from '../hooks/maker'
 import { $env } from '../env'
+import { getChainName } from '../utils/getEnvName'
+
 const stateTags = {
   1: { label: '成功', type: 'success' },
   2: { label: '人工确认成功', type: 'success' },
   3: { label: '人工确认无回款', type: 'info' },
   4: { label: '多条tx匹配', type: 'warning' },
-  5: { label: '失败', type: 'danger' },
+  5: { label: '待确认', type: 'danger' },
+  6: { label: '存疑', type: 'danger' },
 }
+
 const CHAIN_NAME_MAPPING = {
   mainnet: 'Mainnet',
   arbitrum: 'Arbitrum',
@@ -596,6 +523,7 @@ const statistics = ref({
   failByAdminCount: 0,
   failByMultiCount: 0,
   failByUnknownCount: 0,
+  doubtByAdminCount: 0,
   pendingPay: {
     ETH: '',
     USDC: '',
@@ -603,6 +531,8 @@ const statistics = ref({
   },
 })
 const makerNodes: any = ref([])
+const detailModal = ref<any>(undefined)
+
 // computeds
 const list = computed(() =>
   makerNodes.value.filter(
@@ -611,24 +541,10 @@ const list = computed(() =>
       item.userAddress == state.userAddressSelected
   )
 )
-const evn_map = ref({
-  1: 'mainnet',
-  2: 'arbitrum',
-  3: 'zksynclite',
-  7: 'optimism',
-  15: 'bsc',
-  14: 'zksyncera',
-  4: 'starknet',
-  16: 'Arbitrum Nova',
-})
 
-const formatDate = (timestamp: number) => {
+const formatDate = (timestamp: string) => {
   return dayjs(timestamp * 1000).format()
 }
-
-const dialogVisible = ref(false)
-const currentItem = ref<any>()
-const hash = ref<string>()
 
 const loadingNodes = ref(false)
 const currentPage = ref(1)
@@ -655,7 +571,6 @@ async function getStatistics() {
   statistics.value = res
 }
 
-const getMakerWealth = () => makerWealth.get(makerAddressSelected?.value)
 const reset = () => {
   state.rangeDate = [
     dayjs().subtract(10, 'day').toDate(),
@@ -706,61 +621,14 @@ const getMakerNodes = async (more: any = {}) => {
 
 const chains = toRef(makerInfo.state, 'chains')
 
-watch(chains, () => {
-  if (!chains.value || chains.value.length) {
-    return
-  }
-  for (let index = 0; index < chains.value.length; index++) {
-    const element = chains.value[index]
-    evn_map[element.chainId] = element.chainName
-  }
-})
-
-const onUpdate = async (item: MakerNode, status: 0 | 1 | 2, hash?: string) => {
-  const token = window.sessionStorage.getItem('token')
-
-  if (!token) {
-    ElMessage({
-      showClose: true,
-      message: '请先登录',
-      type: 'error',
-    })
-    return false
-  }
-  if (status !== 1) {
-    await ElMessageBox.confirm('确认更改?')
-  }
-  const loading = ElLoading.service({ fullscreen: true })
-  try {
-    const ok = await submit(status, item.id.toString(), hash)
-    if (ok) {
-      ElMessage({
-        showClose: true,
-        message: '操作成功',
-        type: 'success',
-      })
-      await getMakerNodes()
-      await getStatistics()
-    } else {
-      throw Error('submit fail')
-    }
-  } catch {
-    ElMessage({
-      showClose: true,
-      message: '操作失败',
-      type: 'error',
-    })
-  } finally {
-    loading.close()
-  }
+const onUpdate = () => {
+  makerNodes.value = []
+  getMakerNodes()
+  getStatistics()
 }
 
-const handleConfirm = () => {
-  dialogVisible.value = false
-  if (!currentItem.value || !hash.value) {
-    return
-  }
-  onUpdate(currentItem.value, 1, hash.value)
+const onRowClick = (data: any) => {
+  detailModal.value?.show(data)
 }
 
 const getTxHref = (v: MakerNode, hash: string) => {
@@ -908,15 +776,12 @@ const onClickPageButton = (next: boolean) => {
   getMakerNodes()
 }
 const init = () => {
-  getMakerWealth()
   getMakerNodes()
   getStatistics()
 }
 makerInfo.get()
 reset()
 init()
-// When makerAddressSelected changed, get maker's data
-watch(() => makerAddressSelected?.value, init)
 </script>
 
 <style lang="scss">
