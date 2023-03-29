@@ -8,9 +8,14 @@
     >
       登录
     </el-button>
-    <el-tag v-else>
+    <el-button text v-else disabled>
       {{ name }}
-    </el-tag>
+    </el-button>
+
+    <el-button text type="danger" v-if="isLogin" @click="logout">
+      退出登录
+    </el-button>
+
     <el-dialog v-model="dialogVisible" title="Login" width="30%">
       <div>
         <div>
@@ -95,6 +100,15 @@ const handleConfirm = async () => {
   } finally {
     loading.close()
   }
+}
+
+const logout = () => {
+  window.sessionStorage.removeItem('token')
+  window.sessionStorage.removeItem('name')
+  isLogin.value = false
+  name.value = ''
+  password.value = ''
+  account.value = ''
 }
 </script>
 

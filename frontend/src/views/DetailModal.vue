@@ -60,7 +60,11 @@
       <el-divider />
       <div v-if="makerTx">
         <el-button @click="remarkDialogVisible = true"> 添加备注 </el-button>
-        <el-button type="info" @click="onUpdate(makerTx, 3)">
+        <el-button
+          type="info"
+          @click="onUpdate(makerTx, 3)"
+          v-if="makerTx.state !== 6"
+        >
           标记存疑
         </el-button>
         <el-button
@@ -72,13 +76,15 @@
         </el-button>
         <el-button
           type="danger"
-          v-if="makerTx.state === 5"
+          v-if="makerTx.state === 5 || makerTx.state === 6"
           @click="onUpdate(makerTx, 2)"
         >
           确认无回款
         </el-button>
         <el-button
-          v-if="makerTx.state === 5 || makerTx.state === 4"
+          v-if="
+            makerTx.state === 5 || makerTx.state === 4 || makerTx.state === 6
+          "
           type="success"
           @click="() => (confirmDialogVisible = true)"
         >
@@ -419,6 +425,10 @@ const getAmount = (tx: any) => {
 
     const amount = data?.params?.[1]?.value
     return amount ?? ''
+  }
+
+  if (tx.amount) {
+    return tx.amount ?? ''
   }
 
   return ''
