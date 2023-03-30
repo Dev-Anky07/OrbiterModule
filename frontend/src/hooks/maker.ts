@@ -77,14 +77,14 @@ function transforeDate(params: any = {}) {
   }
 }
 function getDecimals(chainId, symbol) {
-  if (symbol) {
+  if (!symbol) {
     return 18
   }
-  const chain = chains.find((e) => Number(e.internalId) === chainId)
+  const chain = chains.find((e) => Number(e.internalId) === Number(chainId))
   if (!chain) {
     return 18
   }
-  const token = chain.tokens.find((e) => e.name === symbol)
+  const token = chain.tokens.find((e) => e.symbol === symbol)
   if (!token) {
     return 18
   }
